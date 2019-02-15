@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
-import gitlab,click
+import gitlab,click,os
 from click_help_colors import HelpColorsGroup, HelpColorsCommand
-
+from . import common
 
 @click.group(cls=HelpColorsGroup, help_headers_color='yellow', help_options_color='green')
 def get():
@@ -23,7 +23,7 @@ def projects(group, url, token):
 
     You can filter by Gitlab group using the corresponding option!
     """
-    gl = performConnection(url, token)
+    gl = common.performConnection(url, token)
 
     try:
         if group:
@@ -45,7 +45,7 @@ def projects(group, url, token):
 def branches(team, url, token, project_name):
     """With this command you can get a list of all branches inside a Project."""
     if(team != "phG1TL4BCTL"):
-        gl = performConnection(url, token)
+        gl = common.performConnection(url, token)
 
         try:
             project_full_name = team + '/' + project_name
@@ -67,7 +67,7 @@ def branches(team, url, token, project_name):
 @click.option('--token', '-tk', required=False, help="Private token to access Gitlab")
 def users(username, url, token):
     """Simple users list, with some filters"""
-    gl = performConnection(url, token)
+    gl = common.performConnection(url, token)
 
     try:
         users = gl.users.list(search=username)
@@ -83,7 +83,7 @@ def users(username, url, token):
 @click.option('--token', '-tk', required=False, help="Private token to access Gitlab")
 def groups(groupname, url, token):
     """Simple groups list"""
-    gl = performConnection(url, token)
+    gl = common.performConnection(url, token)
 
     try:
         if not groupname:

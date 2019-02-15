@@ -2,7 +2,7 @@
 
 import click,gitlab
 from click_help_colors import HelpColorsGroup, HelpColorsCommand
-from . import create
+from . import common,get
 
 @click.group(cls=HelpColorsGroup, help_headers_color='yellow', help_options_color='green')
 def create():
@@ -31,7 +31,7 @@ def project(project_name, description, defaultbranch, namespace, url, token):
     #my_namespace['id'] =
     my_project['namespace'] = my_namespace
 
-    gl = performConnection(url, token)
+    gl = common.performConnection(url, token)
     print(my_project)
 
     #project = gl.projects.create(my_project)
@@ -51,7 +51,7 @@ def createCommandBranch(branch_name, project, ref, url, token, team):
     a Client creating a new feature to be developed, or simply automating the branches creation.
     """
     try:
-        gl = performConnection(url, token)
+        gl = common.performConnection(url, token)
         project_full_name = team + '/' + project
         branch_project = gl.projects.get(project_full_name)
         branch_project.branches.create({'branch': branch_name, 'ref': ref})

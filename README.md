@@ -25,7 +25,7 @@ Or **yum**:
 ``yum install make``
 
 ### Pip installation
-This tool comes with some dependencies, as it uses [python-gitlab](https://python-gitlab.readthedocs.io/en/stable/install.html) and [Click](https://click.palletsprojects.com/en/7.x/) (as well as [click_help_colors](https://github.com/r-m-n/click-help-colors) libraries to build the CLI & access Gitlab. To install them, the easiest way is using Pip, which you can install using the following commands.
+This tool comes with some dependencies, as it uses [python-gitlab](https://python-gitlab.readthedocs.io/en/stable/install.html) and [Click](https://click.palletsprojects.com/en/7.x/) (as well as [click_help_colors](https://github.com/r-m-n/click-help-colors)) libraries to build the CLI & access Gitlab. To install them, the easiest way is using Pip, which you can install using the following commands.
 
 Using **apt-get**:
 ``apt-get install python3-pip``

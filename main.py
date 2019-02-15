@@ -6,26 +6,6 @@ from functions import create,get
 from click_help_colors import HelpColorsGroup, HelpColorsCommand
 
 
-def defineGitlabHost(url): # Simple checker for host
-    if url:
-        return url
-    else:
-        return os.environ.get('GITLABCTL_URL')
-
-
-def defineGitlabToken(token): # Simple checker for private token
-    if token:
-        return token
-    else:
-        return os.environ.get('GITLABCTL_TOKEN')
-
-
-def performConnection(url, token): # Gitlab connection function (url + private token)
-    connection_host = defineGitlabHost(url)
-    connection_token = defineGitlabToken(token)
-    return gitlab.Gitlab(connection_host, private_token=connection_token)
-
-
 @click.group(cls=HelpColorsGroup, help_headers_color='yellow', help_options_color='green')
 def main(): # Main help & commands
     """A command-line tool to control Gitlab from its API.
