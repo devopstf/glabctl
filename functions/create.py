@@ -22,7 +22,7 @@ def create():
 @click.option('--url', '-u', required=False, help="URL directing to Gitlab")
 @click.option('--token', '-tk', required=False, help="Private token to access Gitlab")
 @click.argument('project_name')
-def createCommandProject(project_name, description, defaultbranch, namespace, visibility, initialize, url, token):
+def createCommandProject(project_name, description, default_branch, namespace, visibility, initialize, url, token):
     gl = common.performConnection(url, token)
     project_json = {}
 
