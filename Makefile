@@ -8,5 +8,5 @@ resolve-dependencies: ## Install all python dependencies through pip
 
 install: # Install my script in /usr/bin
 	@echo "[Script installation] Create a symbolic link from <here> to </usr/local/bin>"
-	@ln -s ${PWD}/main.py /usr/local/bin/gitlabctl
-	@echo "[OK] Script installed on </usr/local/bin> correctly. Try 'gitlabctl --help'!"
+	@ln -s ${PWD}/main.py /usr/local/bin/gcli
+	@echo "[OK] Script installed on </usr/local/bin> correctly. Try 'gcli --help'!"

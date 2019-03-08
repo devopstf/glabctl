@@ -28,7 +28,6 @@ def createCommandProject(project_name, description, default_branch, namespace, v
 
     # Check If any of the command options were defined, then If true, add them to the project JSON
     if namespace != "None":
-        namespace_json = {}
         if gl.groups.list(search=namespace): # Check If group exists before doing anything...
             project_json['namespace_id'] = gl.groups.list(search=namespace)[0].id
         else:
@@ -101,7 +100,6 @@ def createCommandBranch(branch_name, project, reference, url, token, team):
         raise click.ClickException(e)
 
 
-# TODO - Create a validation in --project-name option
 @create.command('tag', short_help='Create a tag inside a project')
 @click.option('--reference', '--ref', '-r', required=False, default="master", help="Choose which branch to use as a reference")
 @click.option('--project-name', '-p', required=True, help="Select the project in which to create the branch. Must be namespace/name.")
@@ -113,6 +111,10 @@ def createCommandTag(tag_name, reference, project_name, url, token):
     
     Project name MUST be provided in the form <group>/<project_name>."""
 
+    if(len(project_name.split('/')) != 2):
+        click.echo('[' + click.style('ERROR', fg='red') + '] The --project-name or -p option should be defined as <group>/<project_name>.')
+        return 1
+
     try:
         gl = common.performConnection(url, token)
 
@@ -123,5 +125,34 @@ def createCommandTag(tag_name, reference, project_name, url, token):
                    + click.style(project_name, fg='yellow')  + '> ... Please, wait.')
         tag_project.tags.create({'tag_name': tag_name, 'ref': reference})
         click.echo('[' + click.style('OK', fg='green') + '] Tag created successfully!')
+    except Exception as e:
+        raise click.ClickException(e)
+
+@create.command('user', short_help='Create an user in Gitlab')
+@click.option('--mail', '-m', required=False, default="None", help="Mail to attach to this user")
+@click.option('--name', '-n', required=True, help="Display name for the user")
+@click.option('--password', '-pw', required=False, default="None", help="Define a password")
+@click.option('--url', '-u', required=False, help="URL directing to Gitlab")
+@click.option('--token', '-tk', required=False, help="Private token to access Gitlab")
+@click.argument('username')
+def createCommandUser(username, mail, name, password, url, token):
+    """Create an user inside Gitlab
+
+    """
+
+    try:
+        gl = common.performConnection(url, token)
+        user_json = {}
+
+        user_json['username'] = username
+        user_json['name'] = name
+
+        if mail != "None":
+            user_json['email'] = mail
+        if password != "None":
+            user_json['password'] = password
+
+        user = gl.users.create(user_json)
+
     except Exception as e:
         raise click.ClickException(e)

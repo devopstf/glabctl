@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import gitlab,click,os
+import gitlab,click,os,json
 from click_help_colors import HelpColorsGroup, HelpColorsCommand
 from . import common
 
