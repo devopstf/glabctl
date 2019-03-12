@@ -2,7 +2,7 @@
 
 
 import gitlab,click,os
-from functions import create,get
+from functions import get,create,delete
 from click_help_colors import HelpColorsGroup
 
 
@@ -24,6 +24,7 @@ def main(): # Main help & commands
 # Build Click command
 main.add_command(get.get)
 main.add_command(create.create)
+main.add_command(delete.delete)
 
 if __name__ == "__main__":
     main()

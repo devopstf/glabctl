@@ -129,15 +129,23 @@ def createCommandTag(tag_name, reference, project_name, url, token):
         raise click.ClickException(e)
 
 @create.command('user', short_help='Create an user in Gitlab')
-@click.option('--mail', '-m', required=False, default="None", help="Mail to attach to this user")
+@click.option('--mail', '-m', required=True, default="None", help="Mail to attach to this user")
 @click.option('--name', '-n', required=True, help="Display name for the user")
 @click.option('--password', '-pw', required=False, default="None", help="Define a password")
+@click.option('--external', '-ext', required=False, is_flag=True, help="Make this user an external user")
+@click.option('--make-admin', '--admin', '-adm', required=False, is_flag=True, help="Make this user an admin")
+@click.option('--group-creator', '-gcreate', required=False, is_flag=True, help="Grant group creation permission")
+@click.option('--private', '-pvt', required=False, is_flag=True, help="Make this user private")
+@click.option('--skip-confirmation', '--skip', required=False, is_flag=True, help="Skip user confirmation")
+@click.option('--reset-password', '--reset', required=False, is_flag=True, help="Send the user a reset link")
+@click.option('--auto-confirm', '-y', required=False, is_flag=True, help="Autoconfirm any prompt")
 @click.option('--url', '-u', required=False, help="URL directing to Gitlab")
 @click.option('--token', '-tk', required=False, help="Private token to access Gitlab")
 @click.argument('username')
-def createCommandUser(username, mail, name, password, url, token):
+def createCommandUser(username, mail, name, password, external, make_admin, group_creator, private, skip_confirmation, reset_password, auto_confirm, url, token):
     """Create an user inside Gitlab
 
+    You can define basic parameters as flags for creation permission and even define an user as an administrator.
     """
 
     try:
@@ -151,8 +159,74 @@ def createCommandUser(username, mail, name, password, url, token):
             user_json['email'] = mail
         if password != "None":
             user_json['password'] = password
+        if make_admin:
+            user_json['admin'] = True
+            if not auto_confirm:
+                click.echo('[' + click.style('WARNING', fg='yellow') + '] You are about to create an admin user...')
+                confirmation = input('Continue? (y/n): ')
+                if confirmation != 'y':
+                    return 1
+        if group_creator:
+            user_json['can_create_group'] = True
+        else:
+            user_json['can_create_group'] = False
+        if private:
+            user_json['private_profile'] = True
+        if skip_confirmation:
+            user_json['skip_confirmation'] = True
+        if reset_password:
+            user_json['reset_password'] = True
+        if external:
+            user_json['external'] = True
 
+        click.echo('[' + click.style('CREATING', fg='yellow') + '] Creating the user <'
+                   + click.style(username, fg='yellow') + '>')
         user = gl.users.create(user_json)
+        click.echo('[' + click.style('OK', fg='green') + '] User created successfully!')
+
+
+    except Exception as e:
+        raise click.ClickException(e)
+
+@create.command('group', short_help='Create a group in Gitlab')
+@click.option('--path', required=True, default="None", help="Path to use for the group")
+@click.option('--description', required=False, default="None", help="Add a description to the group")
+@click.option('--visibility', required=False, default="None", help="Set up the visibility of this group")
+@click.option('--enable-lfs', required=False, is_flag=True, help="Enable EFS on this group")
+@click.option('--enable-access-request', '--access-request', required=False, is_flag=True, help="Enable access request")
+@click.option('--parent-id', '--parent', required=False, default="None", help="Specify if there's a parent group, by ID")
+@click.option('--url', '-u', required=False, help="URL directing to Gitlab")
+@click.option('--token', '-tk', required=False, help="Private token to access Gitlab")
+@click.argument('group_name')
+def createCommandGroup(group_name, path, description, visibility, enable_lfs, enable_access_request, parent_id, url, token):
+    """Create a Group for Gitlab repositories
+
+    You can create a subgroup inside another group, but you'll need that group ID!"""
+
+    try:
+        gl = common.performConnection(url, token)
+        group_json = {}
+
+        group_json['name'] = group_name
+        
+        if path != "None":
+            group_json['path'] = path
+        if description != "None":
+            group_json['description'] = description
+        if visibility != "None":
+            group_json['visibility'] = visibility
+        if enable_lfs:
+            group_json['lfs_enabled'] = True
+        if enable_access_request:
+            group_json['request_access_enabled'] = True
+        if parent_id != "None":
+            group_json['parent_id'] = parent_id
+
+        click.echo('[' + click.style('CREATING', fg='yellow') + '] Creating the group <'
+                   + click.style(group_name, fg='yellow') + '>')
+        group = gl.groups.create(group_json)
+        click.echo('[' + click.style('OK', fg='green') + '] User created successfully!')
+
 
     except Exception as e:
         raise click.ClickException(e)
