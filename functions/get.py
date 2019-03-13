@@ -4,6 +4,20 @@ import gitlab,click,os,json
 from click_help_colors import HelpColorsGroup, HelpColorsCommand
 from . import common
 
+def findSpecificValue(kind, search_result, search_element):
+    for i in search_result:
+        if kind == 'user':
+            if i.username == search_element:
+                found_element = i
+        elif kind == 'group':
+            if i.name == search_element:
+                found_element = i
+    try:
+        return found_element
+    except:
+        click.echo('[' + click.style('ERROR', fg='red') + '] Could not find ' + kind + '<' + click.style(search_element, fg='yellow') + '> in Gitlab...')
+
+
 @click.group(cls=HelpColorsGroup, help_headers_color='yellow', help_options_color='green')
 def get():
     """Get any element listed in 'Commands' section.
@@ -48,36 +62,33 @@ def getCommandProjects(group, url, token, verbose):
 @click.option('--token', '-tk', required=False, help="Private token to access Gitlab")
 @click.argument('parameter')
 def getCommandProject(project_name, parameter, url, token):
-    """This subcommand can return a value depending on parameter.
+    """This subcommand can return a project value depending on parameter.
+
+    Project name must be defined through --project-name option and it has to be in the form of '<group>/<project_name>'
 
     Available parameters are: 
     
     [id, namespace, namespace_id, members, description, visibility]
     """
+    
+    if not common.validateProjectName(project_name):
+        return 1
+    
+    else:
+        try:
+            gl = common.performConnection(url, token)
+            project = gl.projects.get(project_name)
+            
+            parameters_dict = { 'id': project.id, 'namespace': project.namespace['name'], 'namespace_id': project.namespace['id'],
+                                'members': project.members.list(), 'description': project.description, 'visibility': project.visibility }
+            
+            try:
+                print(parameters_dict[parameter])
+            except:
+                click.echo('[' + click.style('ERROR', fg='red') + '] The parameter <' + click.style(parameter, fg='yellow') + '> is not an expected parameter')
 
-    gl = common.performConnection(url, token)
-
-    try:
-        project = gl.projects.list(search=project_name)
-        project_obj = gl.projects.get(project[0].id)
-        
-        if parameter == "id":
-            print(project[0].id)
-        elif parameter == "namespace":
-            print(project[0].namespace['name'])
-        elif parameter == "namespace_id":
-            print(project[0].namespace['id'])
-        elif parameter == "members":
-            print(project_obj.members.list())
-        elif parameter == "description":
-            print(project[0].description)
-        elif parameter == "visibility":
-            print(project[0].visibility)
-        else:
-            click.echo('[' + click.style('ERROR', fg='red') + '] The parameter <' + click.style(parameter, fg='yellow') + '> is not an expected parameter')
-
-    except Exception as e:
-        raise click.ClickException(e)
+        except Exception as e:
+           raise click.ClickException(e)
 
 
 @get.command('branches', short_help='Get all branches inside a Project')
@@ -134,21 +145,18 @@ def getCommandUser(username, parameter, url, token):
     """
     
     gl = common.performConnection(url, token)
-
     try:
         user = gl.users.list(search=username)
-        
-        if parameter == "id":
-            print(user[0].id)
-        elif parameter == "name":
-            print(user[0].name)
-        elif parameter == "email":
-            print(user[0].email)
-        elif parameter == "identities":
-            print(user[0].identities)
-        else:
-            click.echo('[' + click.style('ERROR', fg='red') + '] The parameter <' + click.style(parameter, fg='yellow') + '> is not an expected parameter')
+        specific_user = findSpecificValue('user', user, username)
 
+        parameter_dict = { 'id': specific_user.id, 'name': specific_user.name, 'email': specific_user.email, 'identities': specific_user.identities }
+
+        try:
+            print(parameter_dict[parameter])
+        except:
+            click.echo('[' + click.style('ERROR', fg='red') + '] The parameter <' + click.style(parameter, fg='yellow') + '> is not an expected parameter')
+            return 1
+            
     except Exception as e:
         raise click.ClickException(e)
 
@@ -198,21 +206,16 @@ def getCommandGroup(groupname, parameter, url, token):
 
     try:
         group = gl.groups.list(search=groupname)
+        specific_group = findSpecificValue('group', group, groupname)
 
-        if parameter == "id":
-            print(group[0].id)
-        elif parameter == "description":
-            print(group[0].description)
-        elif parameter == "visibility":
-            print(group[0].visibility)
-        elif parameter == "full_name":
-            print(group[0].full_name)
-        elif parameter == "parent_id":
-            print(group[0].parent_id)
-        elif parameter == "web_url":
-            print(group[0].web_url)
-        else:
+        parameters_dict = { 'id': specific_group.id, 'description': specific_group.description, 'visibility': specific_group.visibility, 
+                            'full_name': specific_group.full_name, 'parent_id': specific_group.parent_id, 'web_url': specific_group.web_url }
+
+        try:
+            print(parameters_dict[parameter])
+        except:
             click.echo('[' + click.style('ERROR', fg='red') + '] The parameter <' + click.style(parameter, fg='yellow') + '> is not an expected parameter')
-            
+            return 1
+
     except Exception as e:
         raise click.ClickException(e)
