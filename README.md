@@ -1,4 +1,4 @@
-<p align="center"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/GitLab_Logo.svg/1108px-GitLab_Logo.svg.png" width="180"><img src="https://files.realpython.com/media/python-logo.8eb72ea6927b.png" width="200"></p><p></p><p></p>
+<p align="center"><img src="https://i.imgur.com/8vqqwSa.png" width="200"></p><p></p><p></p>
 
 # python-gitlab-scraper
 A Python script to scrape Gitlab API and interact with it. Might help If you need to control the different Gitlab elements creation through a pipeline in an automated way. 
@@ -43,9 +43,9 @@ Once you've executed both commands, you should be able to execute ``gitlabctl --
 
 ## Configuration
 Once installed, you should configure the tool. You can do so by defining these environment variables on your host:
-- ``GITLABCTL_URL``: which is the URL where your Gitlab installation is located
-- ``GITLABCTL_TOKEN``: which is the private token of the user you want to use
+- ``PGCLI_URL``: which is the URL where your Gitlab installation is located
+- ``PGCLI_TOKEN``: which is the private token of the user you want to use
 
-If you don't want to define environment variables on your system, you can also append the flags ``--host`` and ``--token`` in each of the tool's sub-commands (which are ``get`` and ``create``, and below them the ones pointing to the different actions).
+If you don't want to define environment variables on your system, you can also append the flags ``--host`` and ``--token`` in each of the tool's sub-commands.
 
 You have the info on how to use those flags in the ``--help`` documentation of each sub-command, although!
