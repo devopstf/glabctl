@@ -31,9 +31,10 @@ def get():
 @get.command('projects', short_help="Get all projects in Gitlab")
 @click.option('--group', '-g', required=False, help="Specific group to search in")
 @click.option('--verbose', '-v', is_flag=True, help="Enable verbose output")
+@click.option('--with-namespace', is_flag=True, help="Show project name in namespace form")
 @click.option('--url', '-u',required=False, help='URL directing to Gitlab')
 @click.option('--token', '-tk', required=False, help="Private token to access Gitlab")
-def getCommandProjects(group, url, token, verbose):
+def getCommandProjects(group, verbose, with_namespace, url, token):
     """A subcommand to list all projects in Gitlab
 
     You can filter by Gitlab group using the corresponding option!
@@ -48,10 +49,13 @@ def getCommandProjects(group, url, token, verbose):
             projects = gl.projects.list()
             
         for p in projects:
-            click.echo('[' + click.style(p.name, fg='yellow') + ']')
-            if verbose:
+            if with_namespace:
+                click.echo('[' + click.style(p.path_with_namespace, fg='yellow') + ']')
+            elif verbose:
                 print(p)
                 print()
+            else:    
+                click.echo('[' + click.style(p.name, fg='yellow') + ']')
 
     except Exception as e:
         raise click.ClickException(e)
