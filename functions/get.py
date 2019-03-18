@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import gitlab,click,os,json
 from click_help_colors import HelpColorsGroup, HelpColorsCommand
