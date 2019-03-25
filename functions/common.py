@@ -6,14 +6,14 @@ def defineGitlabHost(url): # Simple checker for host
     if url:
         return url
     else:
-        return os.environ.get('GITLABCTL_URL')
+        return os.environ.get('PGCLI_URL')
 
 
 def defineGitlabToken(token): # Simple checker for private token
     if token:
         return token
     else:
-        return os.environ.get('GITLABCTL_TOKEN')
+        return os.environ.get('PGCLI_TOKEN')
 
 
 def performConnection(url, token): # Gitlab connection function (url + private token)

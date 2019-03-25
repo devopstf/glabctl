@@ -39,7 +39,7 @@ def createCommandProject(project_name, description, default_branch, namespace, v
         project_json['description'] = description
     if default_branch != "None":
         project_json['default-branch'] = default_branch
-
+    
     # Generic data 
     project_json['name'] = project_name
     
@@ -57,7 +57,7 @@ def createCommandProject(project_name, description, default_branch, namespace, v
             init_project = gl.projects.get('Administrator/' + project_name)
 
         # Check If there's a default branch so project is initialized with it!
-        if defaultbranch != "None":
+        if default_branch != "None":
             branch = defaultbranch
         else:
             branch = 'master'
@@ -225,7 +225,7 @@ def createCommandGroup(group_name, path, description, visibility, enable_lfs, en
         click.echo('[' + click.style('CREATING', fg='yellow') + '] Creating the group <'
                    + click.style(group_name, fg='yellow') + '>')
         group = gl.groups.create(group_json)
-        click.echo('[' + click.style('OK', fg='green') + '] User created successfully!')
+        click.echo('[' + click.style('OK', fg='green') + '] Group created successfully!')
 
 
     except Exception as e:
