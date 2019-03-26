@@ -24,7 +24,20 @@ def performConnection(url, token): # Gitlab connection function (url + private t
 
 def validateProjectName(project_name):
     if(len(project_name.split('/')) != 2):
-        click.echo('[' + click.style('ERROR', fg='red') + '] The project name should be defined as <group>/<project_name>.')
+        common.clickOutputMessage('ERROR', 'red', 'The project name should be defined as <group>/<project_name>.')
         return False
     else:
         return True
+
+def askForConfirmation(confirmation_string, cancel_string, status='TERMINATING...'):
+    confirmation = input(confirmation_string)
+    if confirmation != 'yes':
+        print()
+        click.OutputMessage(status, 'red', cancel_string)
+        print('--------------------------------------------------------------------------------------')
+        return False
+    else:
+        return True
+
+def clickOutputMessage(status, color, string):
+    click.echo('[' + click.style(status, fg=color) + '] ' + string)

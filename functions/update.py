@@ -5,28 +5,66 @@ from click_help_colors import HelpColorsGroup, HelpColorsCommand
 from . import common
 
 
-def beautifullyDisplayChanges(changes_json):
+def beautifullyDisplayChanges(changes_json, failures_json):
+    changes = ""
+
+    # Output detected changes in configuration...
+    if changes_json:
+        print('--------------------------------------------------------------------------------------')
+        for ki,vi in changes_json.items():
+            for kj,vj in vi.items():
+                if kj == 'before':
+                    changes = click.style(str(vj), fg='red')
+                else:
+                    changes = changes + ' --> ' + click.style(str(vj), fg='yellow')
+            common.clickOutputMessage(ki, 'green', changes) 
+
+    # Output detected errors...
+    if failures_json:
+        print('--------------------------------------------------------------------------------------')
+        print("We detected some errors when updating certain values: ")
+        for failure_key, failure_value in failures_json.items():
+            click.echo('   ' + click.style('>', fg='yellow') + ' ' + failure_value)
+    
     print('--------------------------------------------------------------------------------------')
-    for ki,vi in changes_json.items():
-        for kj,vj in vi.items():
-            if kj == 'before':
-                changes = click.style(str(vj), fg='red')
-            else:
-                changes = changes + ' --> ' + click.style(str(vj), fg='yellow')
-        click.echo('[' + click.style(ki, fg='green') + '] ' + changes) 
+    print(' Take in consideration that If you specified a change but It is not shown it is       ')
+    print(' probably due to the value being already present in the current state of the element  ')
     print('--------------------------------------------------------------------------------------')
 
 def addToChanges(changes_json, key, old_value, new_value):
     changes_json[key] = { "before": old_value, "after": new_value }
     return changes_json
 
-"""
-def optionsBoolValidator(option_value, project_value):
-    if (option_value == "False" or option_value == "True") and option_value != str(project_value):
-        return True
+def applyChanges(element, project, changes_json, failures_json):
+    if changes_json:
+        common.clickOutputMessage('NEW STATE', 'yellow', 'The project parameters are about to change. Please, check the JSON output and validate it!')
+        beautifullyDisplayChanges(changes_json, failures_json)
+        
+        if not common.askForConfirmation('Do you want to update the ' + element + '? (yes/no): ', 'You decided not to save the modifications'):
+            return 1
+        
+        common.clickOutputMessage('SAVING', 'yellow', 'Applying all defined changes')
+        project.save()
+        common.clickOutputMessage('OK', 'green', 'Your changes have been applied correctly')
+
+        if changes_json['archived']:
+            projectArchivator(project, changes_json)
+
     else:
-        return False
-"""
+        common.clickOutputMessage('OK', 'green', 'The changes history is empty. There is nothing to change')
+        return 1
+
+def projectArchivator(project, changes):
+    if changes['archived']['after'] == 'True':
+        common.clickOutputMessage('ARCHIVING', 'yellow', 'Changes include archiving the project...')
+        
+        if common.askForConfirmation('> Do you really want to archive this project? (yes/no): ', 'Project will not be archived', 'ARCHIVING CANCELLED'):
+           project.archive() 
+
+    else:
+        if common.askForConfirmation('> Do you really want to unarchive this project? (yes/no): ', 'Project will remain archived', 'UNARCHIVING CANCELLED'):
+           project.unarchive()
+
 
 @click.group(cls=HelpColorsGroup, help_headers_color='yellow', help_options_color='green')
 def update():
@@ -52,13 +90,13 @@ def update():
 @click.option('--enable-jobs', type=click.Choice(['True', 'False']), help="Toggle Jobs creation")
 @click.option('--enable-snippets', type=click.Choice(['True', 'False']), help="Toggle Snippets")
 @click.option('--enable-shared-runners', type=click.Choice(['True', 'False']), help="Toggle Shared Runners")
-@click.option('--jobs-visibility', type=click.Choice(['True', 'False']), help="Toggle Jobs visibility")
+@click.option('--public-jobs', type=click.Choice(['True', 'False']), help="Toggle Jobs visibility")
 @click.option('--url', '-u', required=False, help='URL directing to Gitlab')
 @click.option('--token', '-tk', required=False, help="Private token to access Gitlab")
 @click.argument('project_name')
 def updateCommandProject(project_name, description, enable_lfs, default_branch, access_request, 
                          owner, visibility, archive, enable_c_reg, enable_issues, enable_merge_requests,
-                         enable_wiki, enable_jobs, enable_snippets, enable_shared_runners, jobs_visibility, url, token):
+                         enable_wiki, enable_jobs, enable_snippets, enable_shared_runners, public_jobs, url, token):
     """Update most of the configurable values of a Project.
 
     Project must be defined in the form of '<group>/<project_name>'. 
@@ -75,7 +113,7 @@ def updateCommandProject(project_name, description, enable_lfs, default_branch, 
             failures = {}
             failures_counter = 0
 
-            click.echo('[' + click.style('VALIDATING...', fg='yellow') + '] The process of checking your changes is being done.')
+            common.clickOutputMessage('VALIDATING...', 'yellow', 'The process of checking your changes is being done.')
 
             # Placeholder IF logic until a better process is developed.
             if (description != None and project.description != description):
@@ -138,26 +176,27 @@ def updateCommandProject(project_name, description, enable_lfs, default_branch, 
                 changes = addToChanges(changes, 'merge_requests_enabled', project.merge_request_enabled, enable_merge_requests)
                 project.merge_request_enabled = enable_merge_requests
 
-            if not changes:
-                click.echo('[' + click.style('OK', fg='green') + '] The changes history is empty. There is nothing to change.')
-                return 1
-            else:
-                click.echo('[' + click.style('NEW STATE', fg='yellow') + '] The project parameters are about to change. Please, check the JSON output and validate it!')
-                beautifullyDisplayChanges(changes)
-            
-                confirmation = input('Do you want to update the project? (yes/no): ')
-                if confirmation != 'yes':
-                    click.echo('[' + click.style('TERMINATING...', fg='red') + '] You decided not save the modifications.')
-                    return 1
-                
-                click.echo('[' + click.style('OK', fg='green') + '] Your changes have been applied correctly.')
-                project.save()
+            if (enable_wiki != None and enable_wiki != str(project.wiki_enabled)):
+                changes = addToChanges(changes, 'wiki_enabled', project.wiki_enabled, enable_wiki)
+                project.wiki_enabled = enable_wiki
 
-            if failures:
-                print("We detected some errors when updating certain values: ")
-                for ki, vi in failures.items():
-                    print(vi)
-                    
+            if (enable_jobs != None and enable_jobs != str(project.jobs_enabled)):
+                changes = addToChanges(changes, 'jobs_enabled', project.jobs_enabled, enable_jobs)
+                project.jobs_enabled = enable_jobs
+
+            if (enable_snippets != None and enable_snippets != str(project.snippets_enabled)):
+                changes = addToChanges(changes, 'snippets_enabled', projects.snippets_enabled, enable_snippets)
+                project.snippets_enabled = enable_snippets
+
+            if (enable_shared_runners != None and enable_shared_runners != str(shared_runners_enabled)):
+                changes = addToChanges(changes, 'shared_runners_enabled', projects.shared_runners_enabled, enable_shared_runners)
+                project.shared_runners_enabled = enable_shared_runners
+
+            if (public_jobs != None and public_jobs != str(public_jobs)):
+                changes = addToChanges(changes, 'public_jobs', projects.public_jobs, public_jobs)
+                project.public_jobs = public_jobs
+
+            applyChanges('project', project, changes, failures)
 
         except Exception as e:
             raise click.ClickException(e)

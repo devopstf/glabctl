@@ -15,7 +15,7 @@ def findSpecificValue(kind, search_result, search_element):
     try:
         return found_element
     except:
-        click.echo('[' + click.style('ERROR', fg='red') + '] Could not find ' + kind + '<' + click.style(search_element, fg='yellow') + '> in Gitlab...')
+        common.clickOutputMessage('ERROR', 'red', 'Could not find ' + kind + '<' + click.style(search_element, fg='yellow') + '> in Gitlab...')
 
 
 @click.group(cls=HelpColorsGroup, help_headers_color='yellow', help_options_color='green')
@@ -89,7 +89,7 @@ def getCommandProject(project_name, parameter, url, token):
             try:
                 print(parameters_dict[parameter])
             except:
-                click.echo('[' + click.style('ERROR', fg='red') + '] The parameter <' + click.style(parameter, fg='yellow') + '> is not an expected parameter')
+                common.clickOutputMessage('ERROR', 'red', 'The parameter <' + click.style(parameter, fg='yellow') + '> is not an expected parameter')
 
         except Exception as e:
            raise click.ClickException(e)
@@ -158,7 +158,7 @@ def getCommandUser(username, parameter, url, token):
         try:
             print(parameter_dict[parameter])
         except:
-            click.echo('[' + click.style('ERROR', fg='red') + '] The parameter <' + click.style(parameter, fg='yellow') + '> is not an expected parameter')
+            common.clickOutputMessage('ERROR', 'red', 'The parameter <' + click.style(parameter, fg='yellow') + '> is not an expected parameter')
             return 1
             
     except Exception as e:
@@ -218,7 +218,7 @@ def getCommandGroup(groupname, parameter, url, token):
         try:
             print(parameters_dict[parameter])
         except:
-            click.echo('[' + click.style('ERROR', fg='red') + '] The parameter <' + click.style(parameter, fg='yellow') + '> is not an expected parameter')
+            common.clickOutputMessage('ERROR', 'red', 'The parameter <' + click.style(parameter, fg='yellow') + '> is not an expected parameter')
             return 1
 
     except Exception as e:

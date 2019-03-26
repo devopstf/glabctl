@@ -31,7 +31,7 @@ def createCommandProject(project_name, description, default_branch, namespace, v
         if gl.groups.list(search=namespace): # Check If group exists before doing anything...
             project_json['namespace_id'] = gl.groups.list(search=namespace)[0].id
         else:
-            click.echo("[" + click.style('ERROR', fg='red') + "] The group doesn't exist.")
+            common.clickOutputMessage('ERROR', 'red', 'The group does not exist.')
             return 1
     if visibility != "None": 
         project_json['visibility'] = visibility
@@ -44,10 +44,10 @@ def createCommandProject(project_name, description, default_branch, namespace, v
     project_json['name'] = project_name
     
     # Output messages & project creation
-    click.echo('[' + click.style('CREATING', fg='yellow') + '] Project <' 
-               + click.style(project_name, fg='yellow') + '> is being created, please wait...')
+    common.clickOutputMessage('CREATING', 'yellow', 'Project <'
+                              + click.style(project_name, fg='yellow') + '> is being created, please wait...')
     project = gl.projects.create(project_json)
-    click.echo('[' + click.style('OK', fg='green') + '] Your project has been created! Please, check your Gitlab UI!')
+    common.clickOutputMessage('OK', 'green', 'Your project has been created! Please, check your Gitlab UI!')
 
     # In case of initialization, create the README.md (or not!)
     if initialize:
@@ -62,8 +62,8 @@ def createCommandProject(project_name, description, default_branch, namespace, v
         else:
             branch = 'master'
 
-        click.echo('[' + click.style('INITIALIZING', fg='yellow') + '] Initializing your project with a README.md on <' 
-                   + click.style(branch, fg='yellow') + '> branch') 
+        common.clickOutputMessage('INITIALIZING', 'yellow', 'Initializing your project with a README.md on <' 
+                                  + click.style(branch, fg='yellow') + '> branch') 
 
         # File creation
         init_file = init_project.files.create({'file_path': 'README.md',
@@ -71,7 +71,7 @@ def createCommandProject(project_name, description, default_branch, namespace, v
                                               'content': '# Initial README of project ' + project_name,
                                               'commit_message': 'Initial commit'})
         
-        click.echo('[' + click.style('OK', fg='green') + '] The project has been initialized!')
+        common.clickOutputMessage('OK', 'green', 'The project has been initialized!')
     
 
 
@@ -93,9 +93,9 @@ def createCommandBranch(branch_name, project, reference, url, token, team):
         project_full_name = team + '/' + project
         branch_project = gl.projects.get(project_full_name)
         branch_project.branches.create({'branch': branch_name, 'ref': reference})
-        click.echo('[' + click.style('OK', fg='green') + '] Branch "' 
-                   + click.style(branch_name, fg='yellow') + '" was created correctly in project "' 
-                   + click.style(project_full_name, fg='yellow') + '"')
+        common.clickOutputMessage('OK', 'green', 'Branch <' 
+                                  + click.style(branch_name, fg='yellow') + '> was created correctly in project <' 
+                                  + click.style(project_full_name, fg='yellow') + '>')
     except Exception as e:
         raise click.ClickException(e)
 
@@ -112,7 +112,7 @@ def createCommandTag(tag_name, reference, project_name, url, token):
     Project name MUST be provided in the form <group>/<project_name>."""
 
     if(len(project_name.split('/')) != 2):
-        click.echo('[' + click.style('ERROR', fg='red') + '] The --project-name or -p option should be defined as <group>/<project_name>.')
+        common.clickOutputMessage('ERROR', 'red', 'The --project-name or -p option should be defined as <group>/<project_name>.')
         return 1
 
     try:
@@ -120,11 +120,11 @@ def createCommandTag(tag_name, reference, project_name, url, token):
 
         project = gl.projects.get(project_name)
         tag_project = gl.projects.get(project.id)
-        click.echo('[' + click.style('TAGGING', fg='yellow') + '] Creating the tag <' 
+        common.clickOutputMessage('TAGGING', 'yellow', 'Creating the tag <' 
                    + click.style(tag_name, fg='yellow') + '> in the project <' 
                    + click.style(project_name, fg='yellow')  + '> ... Please, wait.')
         tag_project.tags.create({'tag_name': tag_name, 'ref': reference})
-        click.echo('[' + click.style('OK', fg='green') + '] Tag created successfully!')
+        common.clickOutputMessage('OK', 'green', 'Tag created successfully!')
     except Exception as e:
         raise click.ClickException(e)
 
@@ -162,7 +162,7 @@ def createCommandUser(username, mail, name, password, external, make_admin, grou
         if make_admin:
             user_json['admin'] = True
             if not auto_confirm:
-                click.echo('[' + click.style('WARNING', fg='yellow') + '] You are about to create an admin user...')
+                common.clickOutputMessage('WARNING', 'yellow', 'You are about to create an admin user...')
                 confirmation = input('Continue? (y/n): ')
                 if confirmation != 'y':
                     return 1
@@ -179,14 +179,14 @@ def createCommandUser(username, mail, name, password, external, make_admin, grou
         if external:
             user_json['external'] = True
 
-        click.echo('[' + click.style('CREATING', fg='yellow') + '] Creating the user <'
-                   + click.style(username, fg='yellow') + '>')
+        common.clickOutputMessage('PROCESSING', 'yellow', 'Creating the user <'
+                                  + click.style(username, fg='yellow') + '>')
         user = gl.users.create(user_json)
-        click.echo('[' + click.style('OK', fg='green') + '] User created successfully!')
-
+        common.clickOutputMessage('OK', 'green', 'User created successfully!')
 
     except Exception as e:
         raise click.ClickException(e)
+
 
 @create.command('group', short_help='Create a group in Gitlab')
 @click.option('--path', required=True, default="None", help="Path to use for the group")
@@ -222,11 +222,11 @@ def createCommandGroup(group_name, path, description, visibility, enable_lfs, en
         if parent_id != "None":
             group_json['parent_id'] = parent_id
 
-        click.echo('[' + click.style('CREATING', fg='yellow') + '] Creating the group <'
-                   + click.style(group_name, fg='yellow') + '>')
-        group = gl.groups.create(group_json)
-        click.echo('[' + click.style('OK', fg='green') + '] Group created successfully!')
 
+        common.clickOutputMessage('CREATING', 'yellow', 'Creating the group <'
+                                  + click.style(group_name, fg='yellow') + '>')
+        group = gl.groups.create(group_json)
+        common.clickOutputMessage('OK', 'green', 'Group created successfully!')
 
     except Exception as e:
         raise click.ClickException(e)

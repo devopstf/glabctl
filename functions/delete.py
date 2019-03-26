@@ -22,11 +22,11 @@ def deleteGitlabElement(kind, gitlab_object, auto_confirm, project_name = '', br
 
 
     if not auto_confirm:
-        click.echo('[' + click.style('WARNING', fg='yellow') + '] You are about to delete the ' + kind + ' <'
-                    + click.style(print_dictionary[kind]['object_to_delete'], fg='yellow') + '> from <' + click.style(print_dictionary[kind]['delete_from'], fg='yellow') + '>.')
-        confirmation = input('Are you sure you want to do this? (yes/no): ')
-        if confirmation != 'yes':
-            click.echo('[' + click.style('TERMINATING...', fg='red') + '] You decided not to delete the ' + kind + '.')
+        common.clickOutputMessage('WARNING', 'yellow', 'You are about to delete the ' + kind + ' <'
+                                  + click.style(print_dictionary[kind]['object_to_delete'], fg='yellow') + '> from <' 
+                                  + click.style(print_dictionary[kind]['delete_from'], fg='yellow') + '>.')
+
+        if not common.askForConfirmation('Are you sure you want to do this? (yes/no): ', 'You decided not to delete the ' + kind + '.'):
             return 1
     
     if kind == 'project':
@@ -40,7 +40,7 @@ def deleteGitlabElement(kind, gitlab_object, auto_confirm, project_name = '', br
     elif kind == 'group':
         gitlab_object.groups.delete(group_id)    
     
-    click.echo('[' + click.style('OK', fg='green') + '] ' + kind.capitalize() + ' has been deleted successfuly')
+    common.clickOutputMessage('OK', 'green', kind.capitalize() + ' has been deleted successfuly')
 
 
 @click.group(cls=HelpColorsGroup, help_headers_color='yellow', help_options_color='green')
