@@ -68,7 +68,7 @@ def getCommandProjects(group, verbose, with_namespace, url, token):
 def getCommandProject(project_name, parameter, url, token):
     """This subcommand can return a project value depending on parameter.
 
-    Project name must be defined through --project-name option and it has to be in the form of '<group>/<project_name>'
+    Project name must be defined through --project-name option and it has to be in the form of '<group>/<project_path>'
 
     Available parameters are: 
     

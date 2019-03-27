@@ -21,13 +21,13 @@ def deleteGitlabElement(kind, gitlab_object, auto_confirm, project_name = '', br
                         'group': { 'object_to_delete': group_name, 'delete_from': 'Gitlab' }}
 
 
-    if not auto_confirm:
-        common.clickOutputMessage('WARNING', 'yellow', 'You are about to delete the ' + kind + ' <'
-                                  + click.style(print_dictionary[kind]['object_to_delete'], fg='yellow') + '> from <' 
-                                  + click.style(print_dictionary[kind]['delete_from'], fg='yellow') + '>.')
-
-        if not common.askForConfirmation('Are you sure you want to do this? (yes/no): ', 'You decided not to delete the ' + kind + '.'):
-            return 1
+    common.clickOutputMessage('WARNING', 'yellow', 'You are about to delete the ' + kind + ' <'
+                              + click.style(print_dictionary[kind]['object_to_delete'], fg='yellow') + '> from <' 
+                              + click.style(print_dictionary[kind]['delete_from'], fg='yellow') + '>.')
+    print('--------------------------------------------------------------------------------------')
+        
+    if not common.askForConfirmation(False, 'Are you sure you want to do this? (yes/no): ', 'You decided not to delete the ' + kind + '.'):
+        return 1
     
     if kind == 'project':
         element.delete()
@@ -40,6 +40,7 @@ def deleteGitlabElement(kind, gitlab_object, auto_confirm, project_name = '', br
     elif kind == 'group':
         gitlab_object.groups.delete(group_id)    
     
+    print('--------------------------------------------------------------------------------------')
     common.clickOutputMessage('OK', 'green', kind.capitalize() + ' has been deleted successfuly')
 
 
@@ -61,7 +62,7 @@ def delete():
 def deleteCommandProject(project_name, auto_confirm, url, token):
     """Delete a project from Gitlab.
 
-    You must define the project in the form of '<group>/<project_name>' or It won't work!"""
+    You must define the project in the form of '<group>/<project_path>' or It won't work!"""
 
     # Check if project name is the one we can use
     if not common.validateProjectName(project_name):
@@ -69,13 +70,14 @@ def deleteCommandProject(project_name, auto_confirm, url, token):
     else:
         try:
             gl = common.performConnection(url, token)
+            common.clickOutputHeader('Deleting', 'Project', project_name)
             deleteGitlabElement('project', gl, auto_confirm, project_name)
         except Exception as e:
             raise click.ClickException(e)
 
 
 @delete.command('branch', short_help="Delete a Branch from a Project")
-@click.option('--project-name', required=True, help="Project to delete the branch from. Must be '<group>/<project_name>'")
+@click.option('--project-name', '-p', required=True, help="Project to delete the branch from. Must be '<group>/<project_path>'")
 @click.option('--auto-confirm', '-y', required=False, is_flag=True, help="Enable auto confirm")
 @click.option('--url', '-u',required=False, help='URL directing to Gitlab')
 @click.option('--token', '-tk', required=False, help="Private token to access Gitlab")
@@ -83,20 +85,21 @@ def deleteCommandProject(project_name, auto_confirm, url, token):
 def deleteCommandBranch(branch_name, project_name, auto_confirm, url, token):
     """Delete a Branch from a Gitlab Project
 
-    You must define the --project-name option in the form of '<group>/<project_name>' or It won't work!"""
+    You must define the --project-name option in the form of '<group>/<project_path>' or It won't work!"""
     
     if not common.validateProjectName(project_name):
         return 1
     else:
         try:
             gl = common.performConnection(url, token)
+            common.clickOutputHeader('Deleting', 'Branch', branch_name, project_name)
             deleteGitlabElement('branch', gl, auto_confirm, project_name, branch_name)
         except Exception as e:
             raise click.ClickException(e)
 
 
 @delete.command('tag', short_help="Delete a Tag from a Branch inside a Project")
-@click.option('--project-name', required=True, help="Project to delete the tag from. Must be '<group>/<project_name>'")
+@click.option('--project-name', '-p', required=True, help="Project to delete the tag from. Must be '<group>/<project_path>'")
 @click.option('--auto-confirm', '-y', required=False, is_flag=True, help="Enable auto confirm")
 @click.option('--url', '-u',required=False, help='URL directing to Gitlab')
 @click.option('--token', '-tk', required=False, help="Private token to access Gitlab")
@@ -104,7 +107,7 @@ def deleteCommandBranch(branch_name, project_name, auto_confirm, url, token):
 def deleteCommandTag(tag_name, project_name, auto_confirm, url, token):
     """Delete a Tag from a Gitlab Project
 
-    You must define the --project-name option in the form of '<group>/<project_name>' or It won't work!
+    You must define the --project-name option in the form of '<group>/<project_path>' or It won't work!
     """
 
     if not common.validateProjectName(project_name):
@@ -112,6 +115,7 @@ def deleteCommandTag(tag_name, project_name, auto_confirm, url, token):
     else:
         try:
             gl = common.performConnection(url, token)
+            common.clickOutputHeader('Deleting', 'Tag', tag_name, project_name)
             deleteGitlabElement('tag', gl, auto_confirm, project_name, '', tag_name)
         except Exception as e:
             raise click.ClickException(e)
@@ -130,6 +134,7 @@ def deleteCommandUser(user_id, auto_confirm, url, token):
     
     try:
         gl = common.performConnection(url, token)
+        common.clickOutputHeader('Deleting', 'User', gitlab_object.users.get(user_id).username)
         deleteGitlabElement('user', gl, auto_confirm, '', '', '', user_id)
     except Exception as e:
         raise click.ClickException(e)
@@ -148,6 +153,7 @@ def deleteCommandGroup(group_id, auto_confirm, url, token):
 
     try:
         gl = common.performConnection(url, token)
+        common.clickOutputHeader('Deleting', 'Group', gl.groups.get(group_id).name)
         deleteGitlabElement('group', gl, auto_confirm, '', '', '', '', group_id)
     except Exception as e:
         raise click.ClickException(e)

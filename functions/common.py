@@ -24,20 +24,44 @@ def performConnection(url, token): # Gitlab connection function (url + private t
 
 def validateProjectName(project_name):
     if(len(project_name.split('/')) != 2):
-        common.clickOutputMessage('ERROR', 'red', 'The project name should be defined as <group>/<project_name>.')
+        clickOutputMessage('ERROR', 'red', 'The project name should be defined as <group>/<project_name>.')
         return False
     else:
         return True
 
-def askForConfirmation(confirmation_string, cancel_string, status='TERMINATING...'):
-    confirmation = input(confirmation_string)
-    if confirmation != 'yes':
-        print()
-        click.OutputMessage(status, 'red', cancel_string)
-        print('--------------------------------------------------------------------------------------')
-        return False
+def askForConfirmation(auto_confirm, confirmation_string, cancel_string, status='TERMINATING...'):
+    if not auto_confirm:
+        confirmation = input(confirmation_string)
+        if confirmation != 'yes':
+            print('--------------------------------------------------------------------------------------')
+            clickOutputMessage(status, 'red', cancel_string)
+            return False
+        else:
+            return True
     else:
         return True
 
 def clickOutputMessage(status, color, string):
     click.echo('[' + click.style(status, fg=color) + '] ' + string)
+
+def clickOutputHeader(action, object_kind, gl_object_name, gl_from = ''):
+    if action == 'Creating':
+        color = 'green'
+    elif action == 'Updating':
+        color = 'yellow'
+    elif action == 'Deleting':
+        color = 'red'
+    else:
+        color = 'yellow'
+    
+    if gl_from != '':
+        additional_string = 'from <' + click.style(gl_from, fg='yellow') + '>'
+    else:
+        additional_string = ''
+
+    print('======================================================================================')
+    print()
+    click.echo('>>>  [' + click.style(action, fg=color) + '] ' + object_kind + ' <' + click.style(gl_object_name, fg='yellow') + '> ' + additional_string + ' ... <<<')
+    print()
+
+    print('======================================================================================')

@@ -25,6 +25,8 @@ def create():
 def createCommandProject(project_name, description, default_branch, namespace, visibility, initialize, url, token):
     gl = common.performConnection(url, token)
     project_json = {}
+    
+    common.clickOutputHeader('Creating', 'Project', namespace + '/' + project_name)
 
     # Check If any of the command options were defined, then If true, add them to the project JSON
     if namespace != "None":
@@ -93,6 +95,7 @@ def createCommandBranch(branch_name, project, reference, url, token, team):
         project_full_name = team + '/' + project
         branch_project = gl.projects.get(project_full_name)
         branch_project.branches.create({'branch': branch_name, 'ref': reference})
+        common.clickOutputHeader('Creating', 'Branch', branch_name, project_full_name + ' (' + reference + ')')
         common.clickOutputMessage('OK', 'green', 'Branch <' 
                                   + click.style(branch_name, fg='yellow') + '> was created correctly in project <' 
                                   + click.style(project_full_name, fg='yellow') + '>')
@@ -102,7 +105,7 @@ def createCommandBranch(branch_name, project, reference, url, token, team):
 
 @create.command('tag', short_help='Create a tag inside a project')
 @click.option('--reference', '--ref', '-r', required=False, default="master", help="Choose which branch to use as a reference")
-@click.option('--project-name', '-p', required=True, help="Select the project in which to create the branch. Must be namespace/name.")
+@click.option('--project-name', '-p', required=True, help="Select the project in which to create the branch. Must be namespace/path.")
 @click.option('--url', '-u', required=False, help="URL directing to Gitlab")
 @click.option('--token', '-tk', required=False, help="Private token to access Gitlab")
 @click.argument('tag_name')
@@ -112,12 +115,13 @@ def createCommandTag(tag_name, reference, project_name, url, token):
     Project name MUST be provided in the form <group>/<project_name>."""
 
     if(len(project_name.split('/')) != 2):
-        common.clickOutputMessage('ERROR', 'red', 'The --project-name or -p option should be defined as <group>/<project_name>.')
+        common.clickOutputMessage('ERROR', 'red', 'The --project-name or -p option should be defined as <group>/<project_path>.')
         return 1
 
     try:
         gl = common.performConnection(url, token)
-
+        
+        common.clickOutputHeader('Creating', 'Tag', tag_name, project_full_name + ' (' + reference + ')')
         project = gl.projects.get(project_name)
         tag_project = gl.projects.get(project.id)
         common.clickOutputMessage('TAGGING', 'yellow', 'Creating the tag <' 
@@ -127,6 +131,7 @@ def createCommandTag(tag_name, reference, project_name, url, token):
         common.clickOutputMessage('OK', 'green', 'Tag created successfully!')
     except Exception as e:
         raise click.ClickException(e)
+
 
 @create.command('user', short_help='Create an user in Gitlab')
 @click.option('--mail', '-m', required=True, default="None", help="Mail to attach to this user")
@@ -151,6 +156,8 @@ def createCommandUser(username, mail, name, password, external, make_admin, grou
     try:
         gl = common.performConnection(url, token)
         user_json = {}
+
+        common.clickOutputHeader('Creating', 'User', username)
 
         user_json['username'] = username
         user_json['name'] = name
@@ -206,7 +213,8 @@ def createCommandGroup(group_name, path, description, visibility, enable_lfs, en
     try:
         gl = common.performConnection(url, token)
         group_json = {}
-
+        
+        common.clickOutputHeader('Creating', 'Group', group_name)
         group_json['name'] = group_name
         
         if path != "None":
@@ -221,7 +229,6 @@ def createCommandGroup(group_name, path, description, visibility, enable_lfs, en
             group_json['request_access_enabled'] = True
         if parent_id != "None":
             group_json['parent_id'] = parent_id
-
 
         common.clickOutputMessage('CREATING', 'yellow', 'Creating the group <'
                                   + click.style(group_name, fg='yellow') + '>')
