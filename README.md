@@ -52,7 +52,7 @@ To install everything, It's as simple as executing the following make commands i
 2. ``make install``
 
 
-## Installation - Using Docker
+### Using Docker
 In case you want to use this pgcli as a [Docker](https://www.docker.com) container because you don't want to install Python in your host machine, you can install it using the following ``make`` command:
 
 1. ``make install-docker``

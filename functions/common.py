@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import gitlab,click,os
+import gitlab,click,os,ast
 
 def defineGitlabHost(url): # Simple checker for host
     if url:
@@ -20,6 +20,10 @@ def performConnection(url, token): # Gitlab connection function (url + private t
     connection_host = defineGitlabHost(url)
     connection_token = defineGitlabToken(token)
     return gitlab.Gitlab(connection_host, private_token=connection_token)
+
+
+def transformToDict(dict_string): # Transform python-gitlab's result to Python Dictionary
+    return ast.literal_eval(str(dict_string).split(' => ')[1])
 
 
 def validateProjectName(project_name):
