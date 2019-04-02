@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
-import gitlab,click,os,ast
+import gitlab,click,os,json,collections
+from ast import literal_eval
 
 def defineGitlabHost(url): # Simple checker for host
     if url:
@@ -22,8 +23,20 @@ def performConnection(url, token): # Gitlab connection function (url + private t
     return gitlab.Gitlab(connection_host, private_token=connection_token)
 
 
-def transformToDict(dict_string): # Transform python-gitlab's result to Python Dictionary
-    return ast.literal_eval(str(dict_string).split(' => ')[1])
+def transformToDict(transformation_string): # Transform python-gitlab's result to Python Dictionary
+    return literal_eval(str(transformation_string).split(' => ')[1])
+
+def transformToJson(dict_string): # Transform to JSON output
+    if isinstance(dict_string, collections.Mapping):
+        return json.dumps(dict_string)
+    else:
+        transformToJson(transformToDict(dict_string))
+
+def prettyPrintJson(json_object, sort_flag):
+    parsed = json.loads(json_object)
+    formatted = json.dumps(parsed, indent=2, sort_keys=sort_flag)
+    
+    print(formatted)
 
 
 def validateProjectName(project_name):
