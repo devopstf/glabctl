@@ -13,7 +13,7 @@ This project is still in development, made in first place to practice Python scr
 
 [![asciicast](https://asciinema.org/a/nMnImVItRIhVF13uQLXMl3i2G.svg)](https://asciinema.org/a/nMnImVItRIhVF13uQLXMl3i2G)
 
-## Pre-requisites
+# Pre-requisites
 This section only applies If you're not using ``pgcli``.
 
 This scraper works in Python, and until there's an alternative way to execute it, you'll need Python installed in your host!
@@ -48,7 +48,7 @@ Or **apk**:
 ``apk add py-pip``
 
 
-## Installation
+# Installation
 Once all pre-requisites are cleared, you can begin the installation! Before we begin, you should decide in which directory to install the tool. We recommend **/opt**, as It's the common one to use, but you can decide one that fits your needs!
 
 To install everything, It's as simple as executing the following make commands inside the directory:
@@ -66,13 +66,13 @@ This will generate an image based on the Dockerfile located under the project's 
 Currently, you only need ``112MB`` disk space for using pgcli!
 
 
-## Usage
+# Usage
 Once you've installed this scraper, you should be able to execute ``pgcli --help`` and get a result!
 
 The ``--help`` option will guide you through the different subcommand this scraper has and should be all you need to use it properly.
 
 
-## Configuration
+# Configuration
 The ``pgcli`` Gitlab scraper needs you to point to a Gitlab server, as well as to specify a way to connect to it. 
 
 You can do so by defining these environment variables on your host:
