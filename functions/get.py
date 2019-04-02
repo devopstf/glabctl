@@ -1,24 +1,21 @@
 #!/usr/bin/python3
 
 
-import gitlab,click,os,json,ast
+import gitlab,click,os
 from click_help_colors import HelpColorsGroup, HelpColorsCommand
 from . import common
 
 
 def findSpecificValue(kind, search_result, search_element):
-    for i in search_result:
-        if kind == 'user':
-            if i.username == search_element:
-                found_element = i
-        elif kind == 'group':
-            if i.path == search_element:
-                found_element = i
-    
-    
     try:
-        return found_element
-    
+        for i in search_result:
+            if kind == 'user':
+                if i.username == search_element:
+                    return i
+            elif kind == 'group':
+                if i.path == search_element:
+                    return i
+
     except:
         common.clickOutputMessage('ERROR', 'red', 'Could not find ' + kind + ' <' + click.style(search_element, fg='yellow') + '> in Gitlab...')
 

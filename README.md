@@ -9,6 +9,10 @@ With this, you won't need to ``curl`` to a messed up URL for automated Gitlab ma
 This project is still in development, made in first place to practice Python scripting, so don't expect much!
 
 
+# Usage example
+
+[![asciicast](https://asciinema.org/a/nMnImVItRIhVF13uQLXMl3i2G.svg)](https://asciinema.org/a/nMnImVItRIhVF13uQLXMl3i2G)
+
 ## Pre-requisites
 This section only applies If you're not using ``pgcli``.
 
@@ -62,7 +66,7 @@ This will generate an image based on the Dockerfile located under the project's 
 Currently, you only need ``112MB`` disk space for using pgcli!
 
 
-## Using pgcli
+## Usage
 Once you've installed this scraper, you should be able to execute ``pgcli --help`` and get a result!
 
 The ``--help`` option will guide you through the different subcommand this scraper has and should be all you need to use it properly.
