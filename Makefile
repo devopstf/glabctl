@@ -2,8 +2,8 @@
 .DEFAULT_GOAL := help
 
 resolve-dependencies: ## Install all python dependencies through pip
-	@echo "[Dependencies] Resolve all dependencies using 'pip'"
-	@pip install --upgrade python-gitlab Click
+	@echo "[Dependencies] Resolve all dependencies using 'pip3'"
+	@pip3 install --upgrade python-gitlab gitlab Click click_help_colors
 	@echo "[OK] All dependencies resolved"
 
 install: # Install my script in /usr/bin

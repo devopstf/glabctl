@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 
-import gitlab,click,os
+import click,os
 from functions import get,create,delete,update
 from click_help_colors import HelpColorsGroup
 

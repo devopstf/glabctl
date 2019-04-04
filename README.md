@@ -71,6 +71,8 @@ Once you've installed this scraper, you should be able to execute ``pgcli --help
 
 The ``--help`` option will guide you through the different subcommand this scraper has and should be all you need to use it properly.
 
+[![asciicast](https://asciinema.org/a/xXZVtO3ST59EK5IgdPq4scL93.svg)](https://asciinema.org/a/xXZVtO3ST59EK5IgdPq4scL93)
+
 
 # Configuration
 The ``pgcli`` Gitlab scraper needs you to point to a Gitlab server, as well as to specify a way to connect to it. 
