@@ -97,8 +97,8 @@ def update():
 @click.option('--enable-shared-runners', type=click.Choice(['True', 'False']), help="Toggle Shared Runners")
 @click.option('--public-jobs', type=click.Choice(['True', 'False']), help="Toggle Jobs visibility")
 @click.option('--auto-confirm', '--yes', is_flag=True, help="Activate automatic confirmation of steps")
-@click.option('--url', '-u', required=False, help='URL directing to Gitlab')
-@click.option('--token', '-tk', required=False, help="Private token to access Gitlab")
+@click.option('--url', required=False, help='URL directing to Gitlab')
+@click.option('--token', required=False, help="Private token to access Gitlab")
 @click.argument('project_name')
 def updateCommandProject(project_name, name, path, sync, description, enable_lfs, default_branch, access_request, 
                          owner, visibility, archive, enable_c_reg, enable_issues, enable_merge_requests, enable_wiki,
@@ -235,8 +235,8 @@ def updateCommandProject(project_name, name, path, sync, description, enable_lfs
 @click.option('--visibility', type=click.Choice(['public', 'private', 'internal']), help="Change the group's visibility")
 @click.option('--parent-id', type=int, help="Toggle Jobs visibility")
 @click.option('--auto-confirm', '--yes', type=bool, default=False, is_flag=True, help="Auto confirm any change")
-@click.option('--url', '-u', required=False, help='URL directing to Gitlab')
-@click.option('--token', '-tk', required=False, help="Private token to access Gitlab")
+@click.option('--url', required=False, help='URL directing to Gitlab')
+@click.option('--token', required=False, help="Private token to access Gitlab")
 @click.argument('group_name')
 def updateCommandProject(group_name, name, path, sync, description, enable_lfs, access_request, visibility, parent_id, auto_confirm, url, token):
     """Update a Group's values and flags."""

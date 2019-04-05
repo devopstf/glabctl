@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-
 import gitlab,click,os
 from click_help_colors import HelpColorsGroup, HelpColorsCommand
 from . import common
@@ -117,8 +116,8 @@ def getCommandProjects(group, raw, verbose, with_namespace, pretty_print, pretty
 @click.option('--project-name', '-p', required=True, help="The project to use")
 @click.option('--pretty-print', '--pretty', is_flag=True, help="Show 'all' parameter output as Pretty JSON")
 @click.option('--pretty-sort', '--sort', '-s', is_flag=True, help="Sort the --pretty-print JSON output")
-@click.option('--url', required=False, help='URL directing to Gitlab')
-@click.option('--token', required=False, help="Private token to access Gitlab")
+@click.option('--url', help='URL directing to Gitlab')
+@click.option('--token', help="Private token to access Gitlab")
 @click.argument('parameter')
 @click.argument('sub_parameter', required=False)
 def getCommandProject(project_name, pretty_print, pretty_sort, parameter, sub_parameter,  url, token):
@@ -161,13 +160,13 @@ def getCommandBranches(project_name, raw, verbose, pretty_print, pretty_sort, ur
 
 
 @get.command('users', short_help='Get registered users')
-@click.option('--username', '-u', required=False, help="Username to search")
+@click.option('--username', '-u', help="Username to search")
 @click.option('--raw', is_flag=True, help="")
 @click.option('--verbose', '-v', is_flag=True, help="")
 @click.option('--pretty-print', '--pretty', is_flag=True, help="Show JSON beautifully")
 @click.option('--pretty-sort', '--sort', '-s', is_flag=True, help="Sort output of pretty-print option")
-@click.option('--url', required=False, help="URL directing to Gitlab")
-@click.option('--token', required=False, help="Private token to access Gitlab")
+@click.option('--url', help="URL directing to Gitlab")
+@click.option('--token', help="Private token to access Gitlab")
 def getCommandUsers(username, raw, verbose, pretty_print, pretty_sort, url, token):
     """Simple users list, with some filters"""
     gl = common.performConnection(url, token)
@@ -185,8 +184,8 @@ def getCommandUsers(username, raw, verbose, pretty_print, pretty_sort, url, toke
 @click.option('--username', '--user', '-u', required=True, help="The user to search with")
 @click.option('--pretty-print', '--pretty', is_flag=True, help="Show JSON beautifully")
 @click.option('--pretty-sort', '--sort', '-s', is_flag=True, help="Sort output of pretty-print option")
-@click.option('--url' ,required=False, help='URL directing to Gitlab')
-@click.option('--token', required=False, help="Private token to access Gitlab")
+@click.option('--url', help='URL directing to Gitlab')
+@click.option('--token', help="Private token to access Gitlab")
 @click.argument('parameter')
 def getCommandUser(username, parameter, pretty_print, pretty_sort, url, token):
     """Get specific values from an user, or even the full JSON output!
@@ -198,13 +197,13 @@ def getCommandUser(username, parameter, pretty_print, pretty_sort, url, token):
 
 
 @get.command('groups', short_help='Get groups created on Gitlab')
-@click.option('--group-name', '--group', '-g', required=False, help="Groups to search")
+@click.option('--group-name', '--group', '-g', help="Groups to search")
 @click.option('--verbose', '-v', is_flag=True, help="Enable verbose output")
 @click.option('--raw', is_flag=True, help="Disable style for Pipeline usage")
 @click.option('--pretty-print', '--pretty', is_flag=True, help="Show JSON beautifully")
 @click.option('--pretty-sort', '--sort', '-s', is_flag=True, help="Sort output of pretty-print option")
-@click.option('--url', '-u', required=False, help="URL directing to Gitlab")
-@click.option('--token', '-tk', required=False, help="Private token to access Gitlab")
+@click.option('--url', help="URL directing to Gitlab")
+@click.option('--token', help="Private token to access Gitlab")
 def getCommandGroups(group_name, verbose, raw, pretty_print, pretty_sort, url, token):
     """Simple groups list"""
     gl = common.performConnection(url, token)
@@ -226,8 +225,8 @@ def getCommandGroups(group_name, verbose, raw, pretty_print, pretty_sort, url, t
 @click.option('--group-name', '--group', '-g', required=True, help="Group name to search with")
 @click.option('--pretty-print', '--pretty', is_flag=True, help="Show JSON beautifully")
 @click.option('--pretty-sort', '--sort', '-s', is_flag=True, help="Sort output of pretty-print option")
-@click.option('--url', '-u', required=False, help="URL directing to Gitlab")
-@click.option('--token', '-tk', required=False, help="Private token to access Gitlab")
+@click.option('--url', help="URL directing to Gitlab")
+@click.option('--token', help="Private token to access Gitlab")
 @click.argument('parameter')
 def getCommandGroup(group_name, parameter, pretty_print, pretty_sort, url, token):
     """Get a specific field from a Group, or even the full JSON output!

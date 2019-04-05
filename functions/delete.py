@@ -24,9 +24,8 @@ def deleteGitlabElement(kind, gitlab_object, auto_confirm, project_name = '', br
     common.clickOutputMessage('WARNING', 'yellow', 'You are about to delete the ' + kind + ' <'
                               + click.style(print_dictionary[kind]['object_to_delete'], fg='yellow') + '> from <' 
                               + click.style(print_dictionary[kind]['delete_from'], fg='yellow') + '>.')
-    print('--------------------------------------------------------------------------------------')
         
-    if not common.askForConfirmation(False, 'Are you sure you want to do this? (yes/no): ', 'You decided not to delete the ' + kind + '.'):
+    if not common.askForConfirmation(auto_confirm, 'Are you sure you want to do this? (yes/no): ', 'You decided not to delete the ' + kind + '.'):
         return 1
     
     if kind == 'project':
@@ -55,9 +54,9 @@ def delete():
 
 
 @delete.command('project', short_help="Delete a Project from Gitlab")
-@click.option('--auto-confirm', '-y', required=False, is_flag=True, help="Enable auto confirm")
-@click.option('--url', '-u',required=False, help='URL directing to Gitlab')
-@click.option('--token', '-tk', required=False, help="Private token to access Gitlab")
+@click.option('--auto-confirm', '--yes', required=False, is_flag=True, help="Enable auto confirm")
+@click.option('--url', required=False, help='URL directing to Gitlab')
+@click.option('--token', required=False, help="Private token to access Gitlab")
 @click.argument('project_name')
 def deleteCommandProject(project_name, auto_confirm, url, token):
     """Delete a project from Gitlab.
@@ -78,9 +77,9 @@ def deleteCommandProject(project_name, auto_confirm, url, token):
 
 @delete.command('branch', short_help="Delete a Branch from a Project")
 @click.option('--project-name', '-p', required=True, help="Project to delete the branch from. Must be '<group>/<project_path>'")
-@click.option('--auto-confirm', '-y', required=False, is_flag=True, help="Enable auto confirm")
-@click.option('--url', '-u',required=False, help='URL directing to Gitlab')
-@click.option('--token', '-tk', required=False, help="Private token to access Gitlab")
+@click.option('--auto-confirm', '--yes', required=False, is_flag=True, help="Enable auto confirm")
+@click.option('--url', required=False, help='URL directing to Gitlab')
+@click.option('--token', required=False, help="Private token to access Gitlab")
 @click.argument('branch_name')
 def deleteCommandBranch(branch_name, project_name, auto_confirm, url, token):
     """Delete a Branch from a Gitlab Project
@@ -100,9 +99,9 @@ def deleteCommandBranch(branch_name, project_name, auto_confirm, url, token):
 
 @delete.command('tag', short_help="Delete a Tag from a Branch inside a Project")
 @click.option('--project-name', '-p', required=True, help="Project to delete the tag from. Must be '<group>/<project_path>'")
-@click.option('--auto-confirm', '-y', required=False, is_flag=True, help="Enable auto confirm")
-@click.option('--url', '-u',required=False, help='URL directing to Gitlab')
-@click.option('--token', '-tk', required=False, help="Private token to access Gitlab")
+@click.option('--auto-confirm', '--yes', required=False, is_flag=True, help="Enable auto confirm")
+@click.option('--url', required=False, help='URL directing to Gitlab')
+@click.option('--token', required=False, help="Private token to access Gitlab")
 @click.argument('tag_name')
 def deleteCommandTag(tag_name, project_name, auto_confirm, url, token):
     """Delete a Tag from a Gitlab Project
@@ -122,9 +121,9 @@ def deleteCommandTag(tag_name, project_name, auto_confirm, url, token):
 
 
 @delete.command('user', short_help="Delete an user from Gitlab")
-@click.option('--auto-confirm', '-y', required=False, is_flag=True, help="Enable auto confirm")
-@click.option('--url', '-u',required=False, help='URL directing to Gitlab')
-@click.option('--token', '-tk', required=False, help="Private token to access Gitlab")
+@click.option('--auto-confirm', '--yes', required=False, is_flag=True, help="Enable auto confirm")
+@click.option('--url', required=False, help='URL directing to Gitlab')
+@click.option('--token', required=False, help="Private token to access Gitlab")
 @click.argument('user_id')
 def deleteCommandUser(user_id, auto_confirm, url, token):
     """Delete an User from Gitlab
@@ -141,9 +140,9 @@ def deleteCommandUser(user_id, auto_confirm, url, token):
 
 
 @delete.command('group', short_help="Delete a group from Gitlab")
-@click.option('--auto-confirm', '-y', required=False, is_flag=True, help="Enable auto confirm")
-@click.option('--url', '-u',required=False, help='URL directing to Gitlab')
-@click.option('--token', '-tk', required=False, help="Private token to access Gitlab")
+@click.option('--auto-confirm', '--yes', required=False, is_flag=True, help="Enable auto confirm")
+@click.option('--url', required=False, help='URL directing to Gitlab')
+@click.option('--token', required=False, help="Private token to access Gitlab")
 @click.argument('group_id')
 def deleteCommandGroup(group_id, auto_confirm, url, token):
     """Delete a Group from Gitlab
