@@ -164,7 +164,7 @@ def createCommandUser(username, mail, name, password, external, make_admin, grou
         user_json['password'] = password
 
         if make_admin:
-            common.clickOutputMessage('WARNING', 'yellow', 'You are about to grant the <' + click.style("admin role", fg=red) + "> to this user...")
+            common.clickOutputMessage('WARNING', 'yellow', 'You are about to grant the <' + click.style("admin role", fg='red') + "> to this user...")
             print('--------------------------------------------------------------------------------------')
             if common.askForConfirmation(auto_confirm, 'Are you sure you want to do this? (yes/no): ', 'You decided not to create the user ' + username + ' as an admin user.'):
                user_json['admin'] = True 
