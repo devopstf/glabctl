@@ -13,14 +13,14 @@ def create():
     """
     pass
 
-@create.command('project', short_help='[WIP] Create a project')
+@create.command('project', short_help='Create a project')
 @click.option('--description', '--desc', '-d', help="Description for the project")
 @click.option('--default-branch', '--branch', '-b', '-defb', help='Default branch to use')
 @click.option('--group', '--namespace', '-g', '-ns', help="Which group/namespace to use")
 @click.option('--visibility', '-v', help="Visibility of this project")
 @click.option('--initialize', '--init', '-i', is_flag=True, help="Initialize project with README.md")
-@click.option('--url', required=False, help="URL directing to Gitlab")
-@click.option('--token', required=False, help="Private token to access Gitlab")
+@click.option('--url', help="URL directing to Gitlab")
+@click.option('--token', help="Private token to access Gitlab")
 @click.argument('project_name')
 def createCommandProject(project_name, description, default_branch, group, visibility, initialize, url, token):
     gl = common.performConnection(url, token)
@@ -52,7 +52,7 @@ def createCommandProject(project_name, description, default_branch, group, visib
     common.clickOutputMessage('OK', 'green', 'Your project has been created! Please, check your Gitlab UI!')
 
     # In case of initialization, create the README.md (or not!)
-    if initialize:
+    if initialize or default_branch == None:
         if group != None: # If namespace were defined, we must adjust the init_project value so we don't point to a wrong project
             init_project = gl.projects.get(group + '/' + project_name)
         else:

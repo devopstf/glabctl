@@ -36,6 +36,9 @@ def printParameters(gl_object, parameter, sub_parameter, pretty_print, pretty_so
 
 
 def outputResultsList(raw, gl_object, get_name, pretty_print, sort_json, use_path): # Prints different outputs: JSON, colorful value, raw value...
+    if sort_json:
+        pretty_print = True
+
     if get_name:
         if use_path:
             printable = gl_object.path_with_namespace

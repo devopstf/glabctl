@@ -55,6 +55,10 @@ To install everything, It's as simple as executing the following make commands i
 1. ``make resolve-dependencies``
 2. ``make install``
 
+If you don't have permission or don't want to use 'root' user explicitly, try using ``sudo`` instead. Take in consideration that you'll need to execute them in the following form:
+1. ``sudo su -c "make resolve-dependencies"``
+2. ``sudo su -c "make install"`` 
+
 
 ### Using Docker
 In case you want to use this pgcli as a [Docker](https://www.docker.com) container because you don't want to install Python in your host machine, you can install it using the following ``make`` command:

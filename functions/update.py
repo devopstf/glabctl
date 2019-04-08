@@ -31,17 +31,24 @@ def beautifullyDisplayChanges(changes_json, failures_json):
     print(' probably due to the value being already present in the current state of the element  ')
     print('--------------------------------------------------------------------------------------')
 
+
 def addToChanges(changes_json, key, old_value, new_value):
     changes_json[key] = { "before": old_value, "after": new_value }
     return changes_json
+
 
 def applyChanges(element, gl_object, changes_json, auto_confirm, failures_json):
     if changes_json:
         common.clickOutputMessage('NEW STATE', 'yellow', 'The ' + element + ' parameters are about to change.')
         beautifullyDisplayChanges(changes_json, failures_json)
         
-        if not common.askForConfirmation(auto_confirm, 'Do you want to update the ' + element + '? (yes/no): ', 'You decided not to save the modifications'):
+        if not common.askForConfirmation(auto_confirm, ' >>> Do you want to update the ' + element + '? (yes/no): ', 'You decided not to save the modifications'):
             return 1
+
+        if 'archived' in changes_json:
+            hideElement(gl_object, changes_json, auto_confirm, 'archived')
+        elif 'state' in changes_json:
+            hideElement(gl_object, changes_json, auto_confirm, 'state')
 
         print('--------------------------------------------------------------------------------------')
         common.clickOutputMessage('SAVING', 'yellow', 'Applying all defined changes')
@@ -49,23 +56,33 @@ def applyChanges(element, gl_object, changes_json, auto_confirm, failures_json):
         print('--------------------------------------------------------------------------------------')
         common.clickOutputMessage('OK', 'green', 'Your changes have been applied correctly')
 
-        if 'archived' in changes_json:
-            projectArchivator(gl_object, changes_json, auto_confirm)
-
     else:
         common.clickOutputMessage('OK', 'green', 'The changes history is empty. There is nothing to change')
         return 1
 
-def projectArchivator(project, changes, auto_confirm):
-    if changes['archived']['after'] == 'True':
-        common.clickOutputMessage('ARCHIVING', 'yellow', 'Changes include archiving the project...')
+
+def hideElement(gl_object, changes, auto_confirm, key):
+    print('--------------------------------------------------------------------------------------')
+    if changes[key]['after'] in ('True', 'blocked'):
+        if key == 'archived':
+            common.clickOutputMessage('ARCHIVING', 'yellow', 'Changes include archiving the project...')
         
-        if common.askForConfirmation(auto_confirm, '> Do you really want to archive this project? (yes/no): ', 'Project will not be archived', 'ARCHIVING CANCELLED'):
-            project.archive() 
+            if common.askForConfirmation(auto_confirm, ' >>> Do you really want to archive this project? (yes/no): ', 'Project will not be archived', 'ARCHIVING CANCELLED'):
+                gl_object.archive() 
+
+        elif key == 'state':
+            if common.askForConfirmation(auto_confirm, ' >>> Do you really want to block this user? (yes/no): ', 'User will remain unblocked in this system', 'BLOCK CANCELLED'):
+                gl_object.block()
 
     else:
-        if common.askForConfirmation(auto_confirm, '> Do you really want to unarchive this project? (yes/no): ', 'Project will remain archived', 'UNARCHIVING CANCELLED'):
-            project.unarchive()
+        if key == 'archived':
+            if common.askForConfirmation(auto_confirm, ' >>> Do you really want to unarchive this project? (yes/no): ', 'Project will remain archived', 'UNARCHIVING CANCELLED'):
+                gl_object.unarchive()
+
+        elif key == 'state':
+            if common.askForConfirmation(auto_confirm, ' >>> Do you really want to unblock this user? (yes/no): ',
+                                         'User will remain blocked in this system', 'UNBLOCK CANCELLED'):
+                gl_object.unblock()
 
 
 @click.group(cls=HelpColorsGroup, help_headers_color='yellow', help_options_color='green')
@@ -97,8 +114,8 @@ def update():
 @click.option('--enable-shared-runners', type=click.Choice(['True', 'False']), help="Toggle Shared Runners")
 @click.option('--public-jobs', type=click.Choice(['True', 'False']), help="Toggle Jobs visibility")
 @click.option('--auto-confirm', '--yes', is_flag=True, help="Activate automatic confirmation of steps")
-@click.option('--url', required=False, help='URL directing to Gitlab')
-@click.option('--token', required=False, help="Private token to access Gitlab")
+@click.option('--url', help='URL directing to Gitlab')
+@click.option('--token', help="Private token to access Gitlab")
 @click.argument('project_name')
 def updateCommandProject(project_name, name, path, sync, description, enable_lfs, default_branch, access_request, 
                          owner, visibility, archive, enable_c_reg, enable_issues, enable_merge_requests, enable_wiki,
@@ -234,11 +251,11 @@ def updateCommandProject(project_name, name, path, sync, description, enable_lfs
 @click.option('--access-request', type=click.Choice(['True', 'False']), help="Edit the Request Access option")
 @click.option('--visibility', type=click.Choice(['public', 'private', 'internal']), help="Change the group's visibility")
 @click.option('--parent-id', type=int, help="Toggle Jobs visibility")
-@click.option('--auto-confirm', '--yes', type=bool, default=False, is_flag=True, help="Auto confirm any change")
-@click.option('--url', required=False, help='URL directing to Gitlab')
-@click.option('--token', required=False, help="Private token to access Gitlab")
+@click.option('--auto-confirm', '--yes', is_flag=True, help="Auto confirm any change")
+@click.option('--url', help='URL directing to Gitlab')
+@click.option('--token', help="Private token to access Gitlab")
 @click.argument('group_name')
-def updateCommandProject(group_name, name, path, sync, description, enable_lfs, access_request, visibility, parent_id, auto_confirm, url, token):
+def updateCommandGroup(group_name, name, path, sync, description, enable_lfs, access_request, visibility, parent_id, auto_confirm, url, token):
     """Update a Group's values and flags."""
 
     try:
@@ -294,4 +311,87 @@ def updateCommandProject(group_name, name, path, sync, description, enable_lfs, 
         raise click.ClickException(e)
 
 
+@update.command("user", short_help="Update users parameters")
+@click.option('--name', help='Change user full name')
+@click.option('--email', help='Change users email')
+@click.option('--projects-limit', type=int, help='Amounts of projects this user can create')
+@click.option('--can-create-group', type=click.Choice(['True', 'False']), help='Wether or not this user can create a group')
+@click.option('--can-create-project', type=click.Choice(['True', 'False']), help='Wether or not this user can create projects')
+@click.option('--external', type=click.Choice(['True', 'False']), help='Turn this to <True> if you want to make this user external')
+@click.option('--is-admin', type=click.Choice(['True', 'False']), help='Wether or not you want this user to be an administrator')
+@click.option('--blocked', '--banned', type=click.Choice(['True', 'False']), help='Block or unblock this user')
+@click.option('--auto-confirm', '--yes', is_flag=True, help='Toggle auto confirm')
+@click.option('--url', help='URL directing to Gitlab')
+@click.option('--token', help="Private token to access Gitlab")
+@click.argument('username')
+def updateCommandUser(username, name, email, projects_limit, can_create_group, can_create_project, external, is_admin, blocked, auto_confirm, url, token):
+    try:
+        gl = common.performConnection(url, token)
+        changes = {}
+        failures = {}
+        user = gl.users.list(username=username)[0]
 
+        if name != None and name != user.name:
+            changes = addToChanges(changes, 'name', user.name, name)
+            user.name = name
+
+        if email != None and email != user.email:
+            changes = addToChanges(changes, 'email', user.email, email)
+            user.email = email
+
+        if projects_limit != None and str(projects_limit) != str(user.projects_limit):
+            changes = addToChanges(changes, 'project_limit', user.projects_limit, projects_limit)
+            user.projects_limit = projects_limit
+
+        if can_create_group != None and str(can_create_group) != str(user.can_create_group):
+            changes = addToChanges(changes, 'can_create_group', user.can_create_group, can_create_group)
+            user.can_create_group = can_create_group
+
+        if can_create_project != None and str(can_create_project) != str(user.can_create_project):
+            changes = addToChanges(changes, 'can_create_project', user.can_create_project, can_create_project)
+            user.can_create_project = can_create_project
+
+        if external != None and str(external) != str(user.external):
+            changes = addToChanges(changes, 'external', user.external, external)
+            user.external = external
+
+        if is_admin != None and str(is_admin) != str(user.is_admin):
+            changes = addToChanges(changes, 'is_admin', user.is_admin, is_admin)
+            user.is_admin = is_admin
+
+        if blocked != None and str(blocked) == "True" and user.state != 'blocked':
+            changes = addToChanges(changes, 'state', user.state, 'blocked')
+            user.state = 'blocked'
+
+        elif blocked != None and str(blocked) == "False" and user.state == 'blocked':
+            changes = addToChanges(changes, 'state', user.state, 'active')
+            user.state = 'active'
+
+        applyChanges('user', user, changes, auto_confirm, failures)
+
+    except Exception as e:
+        raise click.ClickException(e)
+
+
+@update.command("branch", short_help="Update branch protection")
+@click.option('--protect', type=click.Choice(['True', 'False']), help="Define if the branch is protected or not")
+@click.option('--project-name', '-p', help="The project where the branch is located. Must be <group>/<project_name>")
+@click.option('--url', help='URL directing to Gitlab')
+@click.option('--token', help="Private token to access Gitlab")
+@click.argument('branch_name')
+def updateCommandBranch(branch_name, protect, project_name, url, token):
+    try:
+        gl = common.performConnection(url, token)
+        changes = {}
+        failures = {}
+        project = gl.projects.get(project_name)
+        branch = project.branches.get(branch_name)
+
+        if protect != None and str(branch.protected) != str(protect):
+            if str(branch.protected) == "True":
+                branch.unprotect()
+            elif str(branch.protected) == "False":
+                branch.protect()
+
+    except Exception as e:
+        raise click.ClickException(e)
