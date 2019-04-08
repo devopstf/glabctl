@@ -35,11 +35,12 @@ def printParameters(gl_object, parameter, sub_parameter, pretty_print, pretty_so
             raise click.ClickException(e)
 
 
-def outputResultsList(raw, gl_object, get_name, pretty_print, sort_json, use_path): # Prints different outputs: JSON, colorful value, raw value...
-    if sort_json:
+def outputResultsList(raw, gl_object, specific_value, pretty_print, sort_json, use_path): # Prints different outputs: JSON, colorful value, raw value...
+    if sort_json or pretty_print:
+        specific_value = False
         pretty_print = True
 
-    if get_name:
+    if specific_value:
         if use_path:
             printable = gl_object.path_with_namespace
         else:
@@ -47,13 +48,14 @@ def outputResultsList(raw, gl_object, get_name, pretty_print, sort_json, use_pat
     else:
         printable = common.transformToDict(gl_object)
 
-    if raw:
+    if raw and not pretty_print:
         print(printable)
-    elif not get_name and pretty_print:
-        json_object = common.transformToJson(printable)
-        common.prettyPrintJson(json_object, sort_json)
-    elif not get_name:
-        print(printable)
+    elif not specific_value:
+        if pretty_print:
+            json_object = common.transformToJson(printable)
+            common.prettyPrintJson(json_object, sort_json)
+        else:
+            print(printable)
     else:
         click.echo('[' + click.style(printable, fg='yellow') + ']')
 

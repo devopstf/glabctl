@@ -43,7 +43,7 @@ This tool comes with some dependencies, as it uses [python-gitlab](https://pytho
 Using **apt-get**:
 ``apt-get install python3-pip``
 Or **yum**:
-``yum install python-pip``
+``yum install python3-pip``
 Or **apk**: 
 ``apk add py-pip``
 
@@ -55,7 +55,7 @@ To install everything, It's as simple as executing the following make commands i
 1. ``make resolve-dependencies``
 2. ``make install``
 
-If you don't have permission or don't want to use 'root' user explicitly, try using ``sudo`` instead. Take in consideration that you'll need to execute them in the following form:
+If **you don't have permission or don't want to use 'root' user explicitly**, try using ``sudo`` instead. Take in consideration that you'll need to execute them in the following form:
 1. ``sudo su -c "make resolve-dependencies"``
 2. ``sudo su -c "make install"`` 
 
@@ -65,7 +65,11 @@ In case you want to use this pgcli as a [Docker](https://www.docker.com) contain
 
 1. ``make install-docker``
 
-This will generate an image based on the Dockerfile located under the project's ``docker`` folder. This image is based on [Alpine](https://alpinelinux.org) for the sake of not using much disk space for this solution. 
+You might **need** to execute this as an administrator. In that case, use this:
+
+1. ``sudo su -c "make install-docker"``
+
+This will generate an image based on the Dockerfile located under the project's ``docker`` folder. This image is based on [Alpine](https://alpinelinux.org) for the sake of not using much disk space for this solution. An additional bash script to execute this image correctly as a Docker container will be linked in */usr/local/bin* so you can only call ``pgcli`` and nothing more!
 
 Currently, you only need ``112MB`` disk space for using pgcli!
 
