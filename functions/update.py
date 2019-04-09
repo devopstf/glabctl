@@ -315,15 +315,13 @@ def updateCommandGroup(group_name, name, path, sync, description, enable_lfs, ac
 @click.option('--name', help='Change user full name')
 @click.option('--projects-limit', type=int, help='Amounts of projects this user can create')
 @click.option('--can-create-group', type=click.Choice(['True', 'False']), help='Wether or not this user can create a group')
-@click.option('--can-create-project', type=click.Choice(['True', 'False']), help='Wether or not this user can create projects')
 @click.option('--external', type=click.Choice(['True', 'False']), help='Turn this to <True> if you want to make this user external')
-@click.option('--is-admin', type=click.Choice(['True', 'False']), help='Wether or not you want this user to be an administrator')
 @click.option('--blocked', '--banned', type=click.Choice(['True', 'False']), help='Block or unblock this user')
 @click.option('--auto-confirm', '--yes', is_flag=True, help='Toggle auto confirm')
 @click.option('--url', help='URL directing to Gitlab')
 @click.option('--token', help="Private token to access Gitlab")
 @click.argument('username')
-def updateCommandUser(username, name, projects_limit, can_create_group, can_create_project, external, is_admin, blocked, auto_confirm, url, token):
+def updateCommandUser(username, name, projects_limit, can_create_group, external, blocked, auto_confirm, url, token):
     """ Update common User values and flags in one go.
 
     Take in consideration you can't change the email as of yet!"""
@@ -346,17 +344,9 @@ def updateCommandUser(username, name, projects_limit, can_create_group, can_crea
             changes = addToChanges(changes, 'can_create_group', user.can_create_group, can_create_group)
             user.can_create_group = can_create_group
 
-        if can_create_project != None and str(can_create_project) != str(user.can_create_project):
-            changes = addToChanges(changes, 'can_create_project', user.can_create_project, can_create_project)
-            user.can_create_project = can_create_project
-
         if external != None and str(external) != str(user.external):
             changes = addToChanges(changes, 'external', user.external, external)
             user.external = external
-
-        if is_admin != None and str(is_admin) != str(user.is_admin):
-            changes = addToChanges(changes, 'is_admin', user.is_admin, is_admin)
-            user.is_admin = is_admin
 
         if blocked != None and str(blocked) == "True" and user.state != 'blocked':
             changes = addToChanges(changes, 'state', user.state, 'blocked')

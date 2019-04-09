@@ -41,8 +41,12 @@ def outputResultsList(raw, gl_object, specific_value, pretty_print, sort_json, u
         pretty_print = True
 
     if specific_value:
-        if use_path:
+        if use_path == "namespace":
             printable = gl_object.path_with_namespace
+        elif use_path == "username":
+            printable = gl_object.username
+        elif use_path == "path":
+            printable = gl_object.path
         else:
             printable = gl_object.name
     else:
@@ -111,7 +115,12 @@ def getCommandProjects(group, raw, verbose, with_namespace, pretty_print, pretty
             projects = gl.projects.list()
         
         for p in projects:
-            outputResultsList(raw, p, not verbose, pretty_print, pretty_sort, with_namespace)
+            if with_namespace:
+                output_parameter = "namespace"
+            else:
+                output_parameter = "placeholder"
+            
+            outputResultsList(raw, p, not verbose, pretty_print, pretty_sort, output_parameter)
 
     except Exception as e:
         raise click.ClickException(e)
@@ -166,20 +175,26 @@ def getCommandBranches(project_name, raw, verbose, pretty_print, pretty_sort, ur
 
 @get.command('users', short_help='Get registered users')
 @click.option('--username', '-u', help="Username to search")
+@click.option('--output-username', is_flag=True, help="Output results using username")
 @click.option('--raw', is_flag=True, help="")
 @click.option('--verbose', '-v', is_flag=True, help="")
 @click.option('--pretty-print', '--pretty', is_flag=True, help="Show JSON beautifully")
 @click.option('--pretty-sort', '--sort', '-s', is_flag=True, help="Sort output of pretty-print option")
 @click.option('--url', help="URL directing to Gitlab")
 @click.option('--token', help="Private token to access Gitlab")
-def getCommandUsers(username, raw, verbose, pretty_print, pretty_sort, url, token):
+def getCommandUsers(username, output_username, raw, verbose, pretty_print, pretty_sort, url, token):
     """Simple users list, with some filters"""
     gl = common.performConnection(url, token)
 
     try:
         users = gl.users.list(username=username)
         for u in users:
-            outputResultsList(raw, u, not verbose, pretty_print, pretty_sort, False)
+            if output_username:
+                output_parameter = "username"
+            else:
+                output_parameter = "placeholder"
+                
+            outputResultsList(raw, u, not verbose, pretty_print, pretty_sort, output_parameter)
 
     except Exception as e:
         raise click.ClickException(e)
@@ -203,24 +218,30 @@ def getCommandUser(username, parameter, pretty_print, pretty_sort, url, token):
 
 @get.command('groups', short_help='Get groups created on Gitlab')
 @click.option('--group-name', '--group', '-g', help="Groups to search")
+@click.option('--get-path', '--path', is_flag=True, help="Return the path parameter instead of the name one")
 @click.option('--verbose', '-v', is_flag=True, help="Enable verbose output")
 @click.option('--raw', is_flag=True, help="Disable style for Pipeline usage")
 @click.option('--pretty-print', '--pretty', is_flag=True, help="Show JSON beautifully")
 @click.option('--pretty-sort', '--sort', '-s', is_flag=True, help="Sort output of pretty-print option")
 @click.option('--url', help="URL directing to Gitlab")
 @click.option('--token', help="Private token to access Gitlab")
-def getCommandGroups(group_name, verbose, raw, pretty_print, pretty_sort, url, token):
+def getCommandGroups(group_name, get_path, verbose, raw, pretty_print, pretty_sort, url, token):
     """Simple groups list"""
     gl = common.performConnection(url, token)
 
     try:
+        if get_path:
+            output_parameter = "path"
+        else:
+            output_parameter = "placeholder"
+
         if group_name == None:
             groups = gl.groups.list()
+            for g in groups:
+                outputResultsList(raw, g, not verbose, pretty_print, pretty_sort, output_parameter)
         else:
             groups = gl.groups.get(group_name)
-            
-        for g in groups:
-            outputResultsList(raw, g, not verbose, pretty_print, pretty_sort, False)
+            outputResultsList(raw, groups, not verbose, pretty_print, pretty_sort, output_parameter)
 
     except Exception as e:
         raise click.ClickException(e)

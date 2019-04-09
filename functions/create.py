@@ -124,7 +124,7 @@ def createCommandTag(tag_name, reference, project_name, url, token):
     try:
         gl = common.performConnection(url, token)
         
-        common.clickOutputHeader('Creating', 'Tag', tag_name, project_full_name + ' (' + reference + ')')
+        common.clickOutputHeader('Creating', 'Tag', tag_name, project_name + ' (' + reference + ')')
         project = gl.projects.get(project_name)
         tag_project = gl.projects.get(project.id)
         common.clickOutputMessage('TAGGING', 'yellow', 'Creating the tag <' 
@@ -138,7 +138,7 @@ def createCommandTag(tag_name, reference, project_name, url, token):
 
 @create.command('user', short_help='Create an user in Gitlab')
 @click.option('--mail', '-m', required=True, help="Mail to attach to this user")
-@click.option('--name', '-n', required=True, help="Display name for the user")
+@click.option('--name', '-n', help="Display name for the user")
 @click.option('--password', '-pw', help="Define a password")
 @click.option('--external', '-ext', is_flag=True, help="Make this user an external user")
 @click.option('--make-admin', '--admin', '-adm', is_flag=True, help="Make this user an admin")
@@ -163,7 +163,10 @@ def createCommandUser(username, mail, name, password, external, make_admin, grou
         common.clickOutputHeader('Creating', 'User', username)
 
         user_json['username'] = username
-        user_json['name'] = name
+        if name != None:
+            user_json['name'] = name
+        else:
+            user_json['name'] = username.capitalize()
         user_json['email'] = mail
         user_json['password'] = password
 
@@ -198,7 +201,7 @@ def createCommandUser(username, mail, name, password, external, make_admin, grou
 
 
 @create.command('group', short_help='Create a group in Gitlab')
-@click.option('--path', required=True, help="Path to use for the group")
+@click.option('--path', help="Path to use for the group")
 @click.option('--description', help="Add a description to the group")
 @click.option('--visibility', help="Set up the visibility of this group")
 @click.option('--enable-lfs', is_flag=True, help="Enable EFS on this group")
@@ -221,6 +224,9 @@ def createCommandGroup(group_name, path, description, visibility, enable_lfs, en
         
         if path != None:
             group_json['path'] = path
+        else:
+            transformed_path = group_name.replace(' ', '-')
+            group_json['path'] = transformed_path.lower()
         if description != None:
             group_json['description'] = description
         if visibility != None:
