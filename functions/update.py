@@ -313,7 +313,6 @@ def updateCommandGroup(group_name, name, path, sync, description, enable_lfs, ac
 
 @update.command("user", short_help="Update users parameters")
 @click.option('--name', help='Change user full name')
-@click.option('--email', help='Change users email')
 @click.option('--projects-limit', type=int, help='Amounts of projects this user can create')
 @click.option('--can-create-group', type=click.Choice(['True', 'False']), help='Wether or not this user can create a group')
 @click.option('--can-create-project', type=click.Choice(['True', 'False']), help='Wether or not this user can create projects')
@@ -324,7 +323,11 @@ def updateCommandGroup(group_name, name, path, sync, description, enable_lfs, ac
 @click.option('--url', help='URL directing to Gitlab')
 @click.option('--token', help="Private token to access Gitlab")
 @click.argument('username')
-def updateCommandUser(username, name, email, projects_limit, can_create_group, can_create_project, external, is_admin, blocked, auto_confirm, url, token):
+def updateCommandUser(username, name, projects_limit, can_create_group, can_create_project, external, is_admin, blocked, auto_confirm, url, token):
+    """ Update common User values and flags in one go.
+
+    Take in consideration you can't change the email as of yet!"""
+
     try:
         gl = common.performConnection(url, token)
         changes = {}
@@ -334,10 +337,6 @@ def updateCommandUser(username, name, email, projects_limit, can_create_group, c
         if name != None and name != user.name:
             changes = addToChanges(changes, 'name', user.name, name)
             user.name = name
-
-        if email != None and email != user.email:
-            changes = addToChanges(changes, 'email', user.email, email)
-            user.email = email
 
         if projects_limit != None and str(projects_limit) != str(user.projects_limit):
             changes = addToChanges(changes, 'project_limit', user.projects_limit, projects_limit)
@@ -380,6 +379,7 @@ def updateCommandUser(username, name, email, projects_limit, can_create_group, c
 @click.option('--token', help="Private token to access Gitlab")
 @click.argument('branch_name')
 def updateCommandBranch(branch_name, protect, project_name, url, token):
+    """Update branch protection status."""
     try:
         gl = common.performConnection(url, token)
         changes = {}

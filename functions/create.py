@@ -23,6 +23,10 @@ def create():
 @click.option('--token', help="Private token to access Gitlab")
 @click.argument('project_name')
 def createCommandProject(project_name, description, default_branch, group, visibility, initialize, url, token):
+    """Create a project & configure its different parameters, as default-branch, visibility, which group does it belong to...
+
+    You can also initialize the project with the default branch using the --init flag! If a default branch is not defined, It'll create a master branch by default!"""
+    
     gl = common.performConnection(url, token)
     project_json = {}
     

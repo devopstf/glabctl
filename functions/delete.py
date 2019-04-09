@@ -2,7 +2,7 @@
 
 import gitlab,click,os,json
 from click_help_colors import HelpColorsGroup, HelpColorsCommand
-from . import common,easter
+from . import common
 
 def deleteGitlabElement(kind, gitlab_object, auto_confirm, project_name = '', branch_name = '', tag_name = '', user_id = '', group_id = ''):
     user_name = group_name = ''
@@ -156,10 +156,4 @@ def deleteCommandGroup(group_id, auto_confirm, url, token):
         deleteGitlabElement('group', gl, auto_confirm, '', '', '', '', group_id)
     except Exception as e:
         raise click.ClickException(e)
-
-
-@delete.command('this', short_help="[Extra] In case of need...")
-def deleteCommandThis():
-    easter.deleteThisEasterEgg()
-
 
