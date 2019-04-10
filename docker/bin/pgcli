@@ -1,3 +1,0 @@
-#!/bin/bash
-
-docker run --rm -t -e PGCLI_URL=$PGCLI_URL -e PGCLI_TOKEN=$PGCLI_TOKEN pgcli:latest $@

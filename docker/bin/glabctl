@@ -1,0 +1,3 @@
+#!/bin/bash
+
+docker run --rm -t -e GLABCTL_URL=$GLABCTL_URL -e GLABCTL_TOKEN=$GLABCTL_TOKEN glabctl:latest $@

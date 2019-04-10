@@ -30,56 +30,59 @@ def createCommandProject(project_name, description, default_branch, group, visib
     gl = common.performConnection(url, token)
     project_json = {}
     
-    common.clickOutputHeader('Creating', 'Project', group + '/' + project_name)
-
-    # Check If any of the command options were defined, then If true, add them to the project JSON
-    if group != None:
-        if gl.groups.list(search=group): # Check If group exists before doing anything...
-            project_json['namespace_id'] = gl.groups.list(search=group)[0].id
+    try:
+        # Check If any of the command options were defined, then If true, add them to the project JSON
+        if group != None:
+            common.clickOutputHeader('Creating', 'Project', group + '/' + project_name)
+            if gl.groups.list(search=group): # Check If group exists before doing anything...
+                project_json['namespace_id'] = gl.groups.list(search=group)[0].id
+            else:
+                common.clickOutputMessage('ERROR', 'red', 'The group does not exist.')
+                return 1
         else:
-            common.clickOutputMessage('ERROR', 'red', 'The group does not exist.')
-            return 1
-    if visibility != None: 
-        project_json['visibility'] = visibility
-    if description != None:
-        project_json['description'] = description
-    if default_branch != None:
-        project_json['default-branch'] = default_branch
-    
-    # Generic data 
-    project_json['name'] = project_name
-    
-    # Output messages & project creation
-    common.clickOutputMessage('CREATING', 'yellow', 'Project <'
-                              + click.style(project_name, fg='yellow') + '> is being created, please wait...')
-    project = gl.projects.create(project_json)
-    common.clickOutputMessage('OK', 'green', 'Your project has been created! Please, check your Gitlab UI!')
-
-    # In case of initialization, create the README.md (or not!)
-    if initialize or default_branch == None:
-        if group != None: # If namespace were defined, we must adjust the init_project value so we don't point to a wrong project
-            init_project = gl.projects.get(group + '/' + project_name)
-        else:
-            gl.auth()
-            current_user = gl.user
-            init_project = gl.projects.get(current_user.username + '/' + project_name)
-
-        # Check If there's a default branch so project is initialized with it!
+            common.clickOutputHeader('Creating', 'Project', common.getTokenUsername(gl) + '/' + project_name)
+        if visibility != None: 
+            project_json['visibility'] = visibility
+        if description != None:
+            project_json['description'] = description
         if default_branch != None:
-            branch = defaultbranch
-        else:
-            branch = 'master'
+            project_json['default-branch'] = default_branch
+    
+        # Generic data 
+        project_json['name'] = project_name
+    
+        # Output messages & project creation
+        common.clickOutputMessage('CREATING', 'yellow', 'Project <'
+                                  + click.style(project_name, fg='yellow') + '> is being created, please wait...')
+        project = gl.projects.create(project_json)
+        common.clickOutputMessage('OK', 'green', 'Your project has been created! Please, check your Gitlab UI!')
 
-        common.clickOutputMessage('INITIALIZING', 'yellow', 'Initializing your project with a README.md on <' 
-                                  + click.style(branch, fg='yellow') + '> branch') 
+        # In case of initialization, create the README.md (or not!)
+        if initialize or default_branch == None:
+            if group != None: # If namespace were defined, we must adjust the init_project value so we don't point to a wrong project
+                init_project = gl.projects.get(group + '/' + project_name)
+            else:
+                init_project = gl.projects.get(common.getTokenUsername(gl) + '/' + project_name)
 
-        # File creation
-        init_file = init_project.files.create({'file_path': 'README.md',
-                                              'branch': branch,
-                                              'content': '# Initial README of project ' + project_name,
-                                              'commit_message': 'Initial commit'})
+            # Check If there's a default branch so project is initialized with it!
+            if default_branch != None:
+                branch = defaultbranch
+            else:
+                branch = 'master'
+
+            common.clickOutputMessage('INITIALIZING', 'yellow', 'Initializing your project with a README.md on <' 
+                                      + click.style(branch, fg='yellow') + '> branch') 
+
+            # File creation
+            init_file = init_project.files.create({'file_path': 'README.md',
+                                                  'branch': branch,
+                                                  'content': '# Initial README of project ' + project_name,
+                                                  'commit_message': 'Initial commit'})
         
-        common.clickOutputMessage('OK', 'green', 'The project has been initialized!')
+            common.clickOutputMessage('OK', 'green', 'The project has been initialized!')
+
+    except Exception as e:
+        raise click.ClickException(e)
     
 
 @create.command('branch', short_help='Create a branch from another one')

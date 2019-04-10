@@ -8,8 +8,8 @@ resolve-dependencies: ## Install all python dependencies through pip
 
 install: # Install my script in /usr/bin
 	@echo "[Script installation] Create a symbolic link from <here> to </usr/local/bin>"
-	@ln -fs ${PWD}/main.py /usr/local/bin/pgcli
-	@echo "[OK] Script installed on </usr/local/bin> correctly. Try 'pgcli --help'!"
+	@ln -fs ${PWD}/main.py /usr/local/bin/glabctl
+	@echo "[OK] Script installed on </usr/local/bin> correctly. Try 'glabctl --help'!"
 
 install-docker: # Install PGCLI using Docker
 	@echo "[Docker] Building the image from 0."

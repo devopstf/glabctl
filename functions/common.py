@@ -7,14 +7,14 @@ def defineGitlabHost(url): # Simple checker for host
     if url:
         return url
     else:
-        return os.environ.get('PGCLI_URL')
+        return os.environ.get('GLABCTL_URL')
 
 
 def defineGitlabToken(token): # Simple checker for private token
     if token:
         return token
     else:
-        return os.environ.get('PGCLI_TOKEN')
+        return os.environ.get('GLABCTL_TOKEN')
 
 
 def performConnection(url, token): # Gitlab connection function (url + private token)
@@ -22,6 +22,10 @@ def performConnection(url, token): # Gitlab connection function (url + private t
     connection_token = defineGitlabToken(token)
     return gitlab.Gitlab(connection_host, private_token=connection_token)
 
+
+def getTokenUsername(gl_object):
+    gl_object.auth()
+    return gl_object.user.username
 
 def transformToDict(transformation_string): # Transform python-gitlab's result to Python Dictionary
     return literal_eval(str(transformation_string).split(' => ')[1])

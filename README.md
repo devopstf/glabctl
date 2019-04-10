@@ -1,7 +1,7 @@
 <p align="center"><img src="https://i.imgur.com/8vqqwSa.png"></p><p></p><p></p>
 
 
-# PGCLI - A Gitlab API Scraper 
+# GLABCTL - A Gitlab API Scraper 
 A Python script to scrape Gitlab API and interact with it. Might help If you need to control the different Gitlab elements creation through a pipeline in an automated way. 
 
 With this, you won't need to ``curl`` to a messed up URL for automated Gitlab management (i.e Create a project branch dinamically because a business petition needs so due to the need of develop a new application feature).
@@ -11,10 +11,10 @@ This project is still in development, made in first place to practice Python scr
 
 # Usage example
 
-[![asciicast](https://asciinema.org/a/nMnImVItRIhVF13uQLXMl3i2G.svg)](https://asciinema.org/a/nMnImVItRIhVF13uQLXMl3i2G)
+[![asciicast](https://asciinema.org/a/kbTUTcwSSJQT4rSPGfMYxlylZ.svg)](https://asciinema.org/a/kbTUTcwSSJQT4rSPGfMYxlylZ)
 
 # Pre-requisites
-This section only applies If you're not using ``pgcli``.
+This section only applies If you're not using ``glabctl``.
 
 This scraper works in Python, and until there's an alternative way to execute it, you'll need Python installed in your host!
 
@@ -69,25 +69,25 @@ You might **need** to execute this as an administrator. In that case, use this:
 
 1. ``sudo su -c "make install-docker"``
 
-This will generate an image based on the Dockerfile located under the project's ``docker`` folder. This image is based on [Alpine](https://alpinelinux.org) for the sake of not using much disk space for this solution. An additional bash script to execute this image correctly as a Docker container will be linked in */usr/local/bin* so you can only call ``pgcli`` and nothing more!
+This will generate an image based on the Dockerfile located under the project's ``docker`` folder. This image is based on [Alpine](https://alpinelinux.org) for the sake of not using much disk space for this solution. An additional bash script to execute this image correctly as a Docker container will be linked in */usr/local/bin* so you can only call ``glabctl`` and nothing more!
 
 Currently, you only need ``112MB`` disk space for using pgcli!
 
 
-# Usage
-Once you've installed this scraper, you should be able to execute ``pgcli --help`` and get a result!
+# Help documentation
+Once you've installed this scraper, you should be able to execute ``glabctl --help`` and get a result!
 
 The ``--help`` option will guide you through the different subcommand this scraper has and should be all you need to use it properly.
 
-[![asciicast](https://asciinema.org/a/xXZVtO3ST59EK5IgdPq4scL93.svg)](https://asciinema.org/a/xXZVtO3ST59EK5IgdPq4scL93)
+[![asciicast](https://asciinema.org/a/Vr48OdxiBlOigmVNMBbz16CL8.svg)](https://asciinema.org/a/Vr48OdxiBlOigmVNMBbz16CL8)
 
 
 # Configuration
-The ``pgcli`` Gitlab scraper needs you to point to a Gitlab server, as well as to specify a way to connect to it. 
+The ``glabctl`` Gitlab scraper needs you to point to a Gitlab server, as well as to specify a way to connect to it. 
 
 You can do so by defining these environment variables on your host:
-- ``PGCLI_URL``: which is the URL where your Gitlab installation is located
-- ``PGCLI_TOKEN``: which is the private token of the user you want to use
+- ``GLABCTL_URL``: which is the URL where your Gitlab installation is located
+- ``GLABCTL_TOKEN``: which is the private token of the user you want to use
 
 If you don't want to define environment variables on your system, you can also append the flags ``--host`` and ``--token`` in each of the tool's sub-commands.
 
