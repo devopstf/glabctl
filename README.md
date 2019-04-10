@@ -1,4 +1,4 @@
-<p align="center"><img src="https://i.imgur.com/8vqqwSa.png"></p><p></p><p></p>
+<p align="center"><img src="https://i.imgur.com/lhmy9yN.png"></p><p></p><p></p>
 
 
 # GLABCTL - A Gitlab API Scraper 
