@@ -124,7 +124,7 @@ def deleteCommandTag(tag_name, project_name, auto_confirm, url, token):
 @click.option('--auto-confirm', '--yes', required=False, is_flag=True, help="Enable auto confirm")
 @click.option('--url', help='URL directing to Gitlab')
 @click.option('--token', help="Private token to access Gitlab")
-@click.argument('user_id')
+@click.argument('user_id', type=int)
 def deleteCommandUser(user_id, auto_confirm, url, token):
     """Delete an User from Gitlab
 
@@ -133,7 +133,7 @@ def deleteCommandUser(user_id, auto_confirm, url, token):
     
     try:
         gl = common.performConnection(url, token)
-        common.clickOutputHeader('Deleting', 'User', gitlab_object.users.get(user_id).username)
+        common.clickOutputHeader('Deleting', 'User', gl.users.get(user_id).username)
         deleteGitlabElement('user', gl, auto_confirm, '', '', '', user_id)
     except Exception as e:
         raise click.ClickException(e)
@@ -143,7 +143,7 @@ def deleteCommandUser(user_id, auto_confirm, url, token):
 @click.option('--auto-confirm', '--yes', is_flag=True, help="Enable auto confirm")
 @click.option('--url', help='URL directing to Gitlab')
 @click.option('--token', help="Private token to access Gitlab")
-@click.argument('group_id')
+@click.argument('group_id', type=int)
 def deleteCommandGroup(group_id, auto_confirm, url, token):
     """Delete a Group from Gitlab
 

@@ -89,6 +89,6 @@ You can do so by defining these environment variables on your host:
 - ``GLABCTL_URL``: which is the URL where your Gitlab installation is located
 - ``GLABCTL_TOKEN``: which is the private token of the user you want to use
 
-If you don't want to define environment variables on your system, you can also append the flags ``--host`` and ``--token`` in each of the tool's sub-commands.
+If you don't want to define environment variables on your system, you can also append the flags ``--url`` and ``--token`` in each of the tool's sub-commands.
 
 You have the info on how to use those flags in the ``--help`` documentation of each sub-command, although!

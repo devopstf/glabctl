@@ -49,11 +49,15 @@ def applyChanges(element, gl_object, changes_json, auto_confirm, failures_json):
             hideElement(gl_object, changes_json, auto_confirm, 'archived')
         elif 'state' in changes_json:
             hideElement(gl_object, changes_json, auto_confirm, 'state')
+        if 'protected' in changes_json:
+            hideElement(gl_object, changes_json, auto_confirm, 'protected')
 
-        print('--------------------------------------------------------------------------------------')
-        common.clickOutputMessage('SAVING', 'yellow', 'Applying all defined changes')
-        gl_object.save()
-        print('--------------------------------------------------------------------------------------')
+        if element != 'branch':
+            print('--------------------------------------------------------------------------------------')
+            common.clickOutputMessage('SAVING', 'yellow', 'Applying all defined changes')
+            gl_object.save()
+            print('--------------------------------------------------------------------------------------')
+        
         common.clickOutputMessage('OK', 'green', 'Your changes have been applied correctly')
 
     else:
@@ -62,28 +66,36 @@ def applyChanges(element, gl_object, changes_json, auto_confirm, failures_json):
 
 
 def hideElement(gl_object, changes, auto_confirm, key):
-    print('--------------------------------------------------------------------------------------')
-    if changes[key]['after'] in ('True', 'blocked'):
-        if key == 'archived':
-            common.clickOutputMessage('ARCHIVING', 'yellow', 'Changes include archiving the project...')
+    if not auto_confirm:
+        print('--------------------------------------------------------------------------------------')
+        if changes[key]['after'] in ('True', 'blocked'):
+            if key == 'archived':
+                common.clickOutputMessage('ARCHIVING', 'yellow', 'Changes include archiving the project...')
         
-            if common.askForConfirmation(auto_confirm, ' >>> Do you really want to archive this project? (yes/no): ', 'Project will not be archived', 'ARCHIVING CANCELLED'):
-                gl_object.archive() 
+                if common.askForConfirmation(auto_confirm, ' >>> Do you really want to archive this project? (yes/no): ', 'Project will not be archived', 'ARCHIVING CANCELLED'):
+                    gl_object.archive() 
 
-        elif key == 'state':
-            if common.askForConfirmation(auto_confirm, ' >>> Do you really want to block this user? (yes/no): ', 'User will remain unblocked in this system', 'BLOCK CANCELLED'):
-                gl_object.block()
+            elif key == 'state':
+                if common.askForConfirmation(auto_confirm, ' >>> Do you really want to block this user? (yes/no): ', 'User will remain unblocked in this system', 'BLOCK CANCELLED'):
+                    gl_object.block()
 
-    else:
-        if key == 'archived':
-            if common.askForConfirmation(auto_confirm, ' >>> Do you really want to unarchive this project? (yes/no): ', 'Project will remain archived', 'UNARCHIVING CANCELLED'):
-                gl_object.unarchive()
+            elif key == 'protected':
+                if common.askForConfirmation(auto_confirm, ' >>> Do you really want to protect this branch? (yes/no): ', 'Branch will remain unprotected in the defined project', 'BLOCK CANCELLED'):
+                    gl_object.protect()
 
-        elif key == 'state':
-            if common.askForConfirmation(auto_confirm, ' >>> Do you really want to unblock this user? (yes/no): ',
-                                         'User will remain blocked in this system', 'UNBLOCK CANCELLED'):
-                gl_object.unblock()
+        else:
+            if key == 'archived':
+                if common.askForConfirmation(auto_confirm, ' >>> Do you really want to unarchive this project? (yes/no): ', 'Project will remain archived', 'UNARCHIVING CANCELLED'):
+                    gl_object.unarchive()
 
+            elif key == 'state':
+                if common.askForConfirmation(auto_confirm, ' >>> Do you really want to unblock this user? (yes/no): ',
+                                             'User will remain blocked in this system', 'UNBLOCK CANCELLED'):
+                    gl_object.unblock()
+            elif key == 'protected':
+                if common.askForConfirmation(auto_confirm, ' >>> Do you really want to unprotect this branch? (yes/no): ', 
+                                             'Branch will remain protected in the defined project', 'UNPROTECT CANCELLED'):
+                    gl_object.unprotect()
 
 @click.group(cls=HelpColorsGroup, help_headers_color='yellow', help_options_color='green')
 def update():
@@ -331,6 +343,10 @@ def updateCommandUser(username, name, projects_limit, can_create_group, external
         changes = {}
         failures = {}
         user = gl.users.list(username=username)[0]
+        
+        common.clickOutputHeader('Updating', 'User', user.username)
+        common.clickOutputMessage('VALIDATING...', 'yellow', 'The process of checking your changes is being done.')
+        print('--------------------------------------------------------------------------------------')
 
         if name != None and name != user.name:
             changes = addToChanges(changes, 'name', user.name, name)
@@ -365,10 +381,11 @@ def updateCommandUser(username, name, projects_limit, can_create_group, external
 @update.command("branch", short_help="Update branch protection")
 @click.option('--protect', type=click.Choice(['True', 'False']), help="Define if the branch is protected or not")
 @click.option('--project-name', '-p', help="The project where the branch is located. Must be <group>/<project_name>")
+@click.option('--auto-confirm', '--yes', is_flag=True, help='Toggle auto confirm')
 @click.option('--url', help='URL directing to Gitlab')
 @click.option('--token', help="Private token to access Gitlab")
 @click.argument('branch_name')
-def updateCommandBranch(branch_name, protect, project_name, url, token):
+def updateCommandBranch(branch_name, protect, project_name, auto_confirm, url, token):
     """Update branch protection status."""
     try:
         gl = common.performConnection(url, token)
@@ -376,12 +393,15 @@ def updateCommandBranch(branch_name, protect, project_name, url, token):
         failures = {}
         project = gl.projects.get(project_name)
         branch = project.branches.get(branch_name)
+    
+        common.clickOutputHeader('Updating', 'Branch', branch.name)
+        common.clickOutputMessage('VALIDATING...', 'yellow', 'The process of checking your changes is being done.')
+        print('--------------------------------------------------------------------------------------')
 
         if protect != None and str(branch.protected) != str(protect):
-            if str(branch.protected) == "True":
-                branch.unprotect()
-            elif str(branch.protected) == "False":
-                branch.protect()
+            changes = addToChanges(changes, 'protected', branch.protected, protect)
+                
+        applyChanges('branch', branch, changes, auto_confirm, failures)
 
     except Exception as e:
         raise click.ClickException(e)
