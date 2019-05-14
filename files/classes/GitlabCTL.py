@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 
 import gitlab,os
-from . import _GitlabCTLCreate
+from . import _GitlabCTLCreate,_GitlabCTLGet
 
-class GitlabCTL(_GitlabCTLCreate.Mixin):
+class GitlabCTL(_GitlabCTLCreate.Mixin,_GitlabCTLGet.Mixin):
 
     def __init__(self, url, token):
         self._url = self.__defineGitlabUrl(url)
