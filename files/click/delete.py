@@ -2,7 +2,7 @@
 
 import gitlab,click,os,json
 from click_help_colors import HelpColorsGroup, HelpColorsCommand
-from . import common
+from .. import common
 
 def deleteGitlabElement(kind, gitlab_object, auto_confirm, project_name = '', branch_name = '', tag_name = '', user_id = '', group_id = ''):
     user_name = group_name = ''

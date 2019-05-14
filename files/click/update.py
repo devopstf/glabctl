@@ -2,7 +2,7 @@
 
 import gitlab,click,os
 from click_help_colors import HelpColorsGroup, HelpColorsCommand
-from . import common
+from .. import common
 
 
 def beautifullyDisplayChanges(changes_json, failures_json):
