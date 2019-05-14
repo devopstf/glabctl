@@ -79,21 +79,18 @@ class Mixin:
 
     
     def createTag(self, tag_name, reference, project_name):
-        if(len(project_name.split('/')) != 2):
-            common.clickOutputMessage('ERROR', 'red', 'The --project-name or -p option should be defined as <group>/<project_path>.')
-            return 1
-
-        try:
-            common.clickOutputHeader('Creating', 'Tag', tag_name, project_name + ' (' + reference + ')')
-            project = self._connection.projects.get(project_name)
-            tag_project = self._connection.projects.get(project.id)
-            common.clickOutputMessage('TAGGING', 'yellow', 'Creating the tag <'
-                                       + click.style(tag_name, fg='yellow') + '> in the project <'
-                                       + click.style(project_name, fg='yellow')  + '> ... Please, wait.')
-            tag_project.tags.create({'tag_name': tag_name, 'ref': reference})
-            common.clickOutputMessage('OK', 'green', 'Tag created successfully!')
-        except Exception as e:
-            raise click.ClickException(e)
+        if common.validateProjectName(project_name):
+            try:
+                common.clickOutputHeader('Creating', 'Tag', tag_name, project_name + ' (' + reference + ')')
+                project = self._connection.projects.get(project_name)
+                tag_project = self._connection.projects.get(project.id)
+                common.clickOutputMessage('TAGGING', 'yellow', 'Creating the tag <'
+                                           + click.style(tag_name, fg='yellow') + '> in the project <'
+                                           + click.style(project_name, fg='yellow')  + '> ... Please, wait.')
+                tag_project.tags.create({'tag_name': tag_name, 'ref': reference})
+                common.clickOutputMessage('OK', 'green', 'Tag created successfully!')
+            except Exception as e:
+                raise click.ClickException(e)
 
 
     def createUser(self, username, mail, name, password, external, make_admin, group_creator, private, skip_confirmation, reset_password, auto_confirm):
